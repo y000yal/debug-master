@@ -1,0 +1,58 @@
+{
+  "name": "debug-master",
+  "title": "Debug Master",
+  "description": "Modern debug log management for WordPress with React interface.",
+  "author": "y0000el",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "cross-env NODE_ENV=production webpack",
+    "dev": "cross-env NODE_ENV=development webpack --watch",
+    "hot": "cross-env NODE_ENV=development webpack serve --mode development",
+    "start": "cross-env NODE_ENV=development webpack serve --mode development",
+    "phpcs": "composer exec phpcs -- --standard=phpcs.xml",
+    "phpcs:fix": "composer exec phpcbf -- --standard=phpcs.xml",
+    "lint": "npm run phpcs"
+  },
+  "dependencies": {
+    "@phosphor-icons/react": "^2.1.7",
+    "@tanstack/react-query": "^5.76.1",
+    "@tanstack/react-query-devtools": "^5.76.1",
+    "@tanstack/react-table": "^8.21.3",
+    "@wordpress/api-fetch": "^7.22.0",
+    "axios": "^1.9.0",
+    "classnames": "^2.5.1",
+    "framer-motion": "^12.15.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-hook-form": "^7.56.3",
+    "react-router-dom": "^7.5.3",
+    "react-select": "^5.10.1",
+    "react-toastify": "^11.0.5",
+    "react-tooltip": "^5.29.1",
+    "tailwind-scrollbar": "^4.0.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.27.1",
+    "@babel/preset-env": "^7.27.1",
+    "@babel/preset-react": "^7.27.1",
+    "@babel/preset-typescript": "^7.27.1",
+    "@tailwindcss/postcss": "^4.1.5",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.3",
+    "autoprefixer": "^10.4.21",
+    "babel-loader": "^10.0.0",
+    "cross-env": "^7.0.3",
+    "css-loader": "^7.1.2",
+    "mini-css-extract-plugin": "^2.9.2",
+    "postcss": "^8.5.3",
+    "postcss-loader": "^8.1.1",
+    "style-loader": "^4.0.0",
+    "tailwindcss": "^4.1.5",
+    "typescript": "^5.8.3",
+    "webpack": "^5.99.7",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.2",
+    "webpackbar": "^7.0.0"
+  }
+}
+
