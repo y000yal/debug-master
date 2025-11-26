@@ -254,5 +254,121 @@ class DebugLogController extends BaseController {
 			200
 		);
 	}
+
+	/**
+	 * Export log file.
+	 *
+	 * @param WP_Rest_Request $request The REST request object.
+	 * @return void|WP_Error
+	 */
+	public function export( WP_Rest_Request $request ) {
+		$log_type = $request->get_param( 'type' ); // 'php', 'js', or 'all'
+		$export_type = $request->get_param( 'export_type' ); // 'date-range' or 'entire-file'
+		$start_date = $request->get_param( 'start_date' );
+		$end_date = $request->get_param( 'end_date' );
+
+		if ( empty( $log_type ) ) {
+			$log_type = 'all';
+		}
+
+		if ( empty( $export_type ) ) {
+			$export_type = 'entire-file';
+		}
+
+		$php_log_file_path = get_option( 'debugm_log_file_path', '' );
+		$js_log_file_path  = get_option( 'debugm_js_log_file_path', '' );
+
+		$export_content = '';
+		$log_type_text = '';
+
+		// Export PHP logs.
+		if ( ( 'all' === $log_type || 'php' === $log_type ) && ! empty( $php_log_file_path ) && file_exists( $php_log_file_path ) ) {
+			$php_content = $this->get_export_content( $php_log_file_path, $export_type, $start_date, $end_date );
+			if ( ! empty( $php_content ) ) {
+				$export_content .= "=== PHP LOGS ===\n\n" . $php_content . "\n\n";
+				$log_type_text .= 'php';
+			}
+		}
+
+		// Export JS logs.
+		if ( ( 'all' === $log_type || 'js' === $log_type ) && ! empty( $js_log_file_path ) && file_exists( $js_log_file_path ) ) {
+			$js_content = $this->get_export_content( $js_log_file_path, $export_type, $start_date, $end_date );
+			if ( ! empty( $js_content ) ) {
+				$export_content .= "=== JAVASCRIPT LOGS ===\n\n" . $js_content . "\n\n";
+				$log_type_text .= ( ! empty( $log_type_text ) ? '-' : '' ) . 'js';
+			}
+		}
+
+		if ( empty( $export_content ) ) {
+			return new \WP_Error(
+				'no_logs',
+				__( 'No logs found to export.', 'debug-master' ),
+				array( 'status' => 404 )
+			);
+		}
+
+		// Set headers for file download.
+		$filename = 'debug-logs-' . ( ! empty( $log_type_text ) ? $log_type_text : 'all' );
+		if ( 'date-range' === $export_type && ! empty( $start_date ) && ! empty( $end_date ) ) {
+			$filename .= '-' . $start_date . '_to_' . $end_date;
+		} else {
+			$filename .= '-entire';
+		}
+		$filename .= '.txt';
+
+		header( 'Content-Type: text/plain' );
+		header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
+		header( 'Content-Length: ' . strlen( $export_content ) );
+		header( 'Cache-Control: no-cache, must-revalidate' );
+		header( 'Pragma: no-cache' );
+		header( 'Expires: 0' );
+
+		echo $export_content;
+		exit;
+	}
+
+	/**
+	 * Get export content from log file based on export type.
+	 *
+	 * @param string $log_file_path Path to log file.
+	 * @param string $export_type Export type: 'date-range' or 'entire-file'.
+	 * @param string|null $start_date Start date for date range export.
+	 * @param string|null $end_date End date for date range export.
+	 * @return string
+	 */
+	private function get_export_content( string $log_file_path, string $export_type, ?string $start_date = null, ?string $end_date = null ): string {
+		if ( ! file_exists( $log_file_path ) || ! is_readable( $log_file_path ) ) {
+			return '';
+		}
+
+		if ( 'entire-file' === $export_type ) {
+			return file_get_contents( $log_file_path );
+		}
+
+		// Date range export.
+		if ( 'date-range' === $export_type && ! empty( $start_date ) && ! empty( $end_date ) && null !== $start_date && null !== $end_date ) {
+			$content = file_get_contents( $log_file_path );
+			$lines = explode( "\n", $content );
+			$filtered_lines = array();
+
+			// Convert dates to timestamps for comparison.
+			$start_timestamp = strtotime( $start_date . ' 00:00:00' );
+			$end_timestamp = strtotime( $end_date . ' 23:59:59' );
+
+			foreach ( $lines as $line ) {
+				// Extract timestamp from log line: [DD-MMM-YYYY HH:MM:SS UTC]
+				if ( preg_match( '/\[(\d{2}-[A-Za-z]{3}-\d{4} \d{2}:\d{2}:\d{2} [^\]]+)\]/', $line, $matches ) ) {
+					$log_timestamp = strtotime( $matches[1] );
+					if ( $log_timestamp >= $start_timestamp && $log_timestamp <= $end_timestamp ) {
+						$filtered_lines[] = $line;
+					}
+				}
+			}
+
+			return implode( "\n", $filtered_lines );
+		}
+
+		return '';
+	}
 }
 

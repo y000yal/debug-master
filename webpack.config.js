@@ -21,9 +21,16 @@ module.exports = {
 		liveReload: false, // Disable live reload, use HMR instead.
 		client: {
 			overlay: false,
-			webSocketURL: 'auto://0.0.0.0:0/ws',
+			webSocketURL: 'ws://localhost:5433/ws',
+			// Prevent fallback to live reload when HMR fails.
+			webSocketTransport: 'ws',
 		},
-		webSocketServer: 'ws',
+		webSocketServer: {
+			type: 'ws',
+			options: {
+				port: 5433,
+			},
+		},
 	},
 	output: {
 		path: path.resolve( __dirname, 'assets/build' ),
@@ -41,9 +48,15 @@ module.exports = {
 	module: {
 		rules: [
 			{
-				test: /\.(ts|tsx)$/,
+				test: /\.(ts|tsx|js|jsx)$/,
 				exclude: /node_modules/,
-				use: 'babel-loader',
+				use: {
+					loader: 'babel-loader',
+					options: {
+						cacheDirectory: isProduction,
+						configFile: path.resolve( __dirname, 'babel.config.js' ),
+					},
+				},
 		},
 			{
 				test: /\.css$/i,
@@ -63,7 +76,9 @@ module.exports = {
 		)] : []),
 		...( ! isProduction && WebpackBar ? [new WebpackBar()] : []),
 		// Enable HMR in development mode.
-		...( ! isProduction ? [new webpack.HotModuleReplacementPlugin()] : [])
+		...( ! isProduction ? [
+			new webpack.HotModuleReplacementPlugin(),
+		] : [])
 	],
 };
 

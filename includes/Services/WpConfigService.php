@@ -150,23 +150,53 @@ class WpConfigService {
 
 		$new_constant = "define( '" . $constant_name . "', " . $formatted_value . " );";
 
-		// Pattern to match define() calls, including those inside if blocks.
-		// This pattern matches: define( 'CONSTANT_NAME', ... );
-		// Match any value (true, false, or string) up to the semicolon.
-		// Pattern to match define() calls - matches the entire define statement.
-		// This handles: define( 'CONSTANT', true ); or define( 'CONSTANT', 'value' );
-		$pattern = "/define\s*\(\s*['\"]" . preg_quote( $constant_name, '/' ) . "['\"]\s*,\s*[^;)]+\)\s*;/i";
+		$escaped_name = preg_quote( $constant_name, '/' );
+		
+		// First, remove any existing definitions of this constant (handles various formats).
+		// This pattern matches define statements with the constant name, handling:
+		// - Single or double quotes around constant name
+		// - Various value formats (strings with escaped quotes, booleans, numbers)
+		// - Multiline defines
+		// - Optional whitespace
+		$remove_patterns = array(
+			// Pattern for single-line defines with single-quoted strings
+			"/define\s*\(\s*['\"]" . $escaped_name . "['\"]\s*,\s*'[^']*'\s*\)\s*;/i",
+			// Pattern for single-line defines with double-quoted strings
+			"/define\s*\(\s*['\"]" . $escaped_name . "['\"]\s*,\s*\"[^\"]*\"\s*\)\s*;/i",
+			// Pattern for booleans and numbers
+			"/define\s*\(\s*['\"]" . $escaped_name . "['\"]\s*,\s*(?:true|false|\d+)\s*\)\s*;/i",
+			// More aggressive pattern for multiline or complex cases
+			"/define\s*\(\s*['\"]" . $escaped_name . "['\"]\s*,[^;]*?\)\s*;/is",
+		);
 
-		if ( preg_match( $pattern, $content, $matches ) ) {
-			// Update existing constant.
-			$content = preg_replace( $pattern, $new_constant, $content );
+		foreach ( $remove_patterns as $pattern ) {
+			$content = preg_replace( $pattern, '', $content );
+		}
+
+		// Also remove empty if blocks that might have been left behind.
+		$content = preg_replace( "/if\s*\(\s*!\s*defined\s*\(\s*['\"]" . $escaped_name . "['\"]\s*\)\s*\)\s*\{\s*\}/i", '', $content );
+
+		// Clean up multiple consecutive blank lines.
+		$content = preg_replace( "/\n\s*\n\s*\n+/", "\n\n", $content );
+
+		// Find the best place to insert the constant - before require_once wp-settings.php.
+		$wp_settings = "require_once ABSPATH . 'wp-settings.php';";
+		if ( strpos( $content, $wp_settings ) !== false ) {
+			// Insert before require_once wp-settings.php.
+			$content = str_replace( $wp_settings, $new_constant . "\n\n" . $wp_settings, $content );
 		} else {
-			// Add new constant before "That's all, stop editing!" comment.
+			// Fallback: try to find "That's all, stop editing!" comment.
 			$stop_editing = "/* That's all, stop editing!";
 			if ( strpos( $content, $stop_editing ) !== false ) {
 				$content = str_replace( $stop_editing, $new_constant . "\n\n" . $stop_editing, $content );
 			} else {
-				$content .= "\n" . $new_constant . "\n";
+				// Last resort: add at end of file before closing PHP tag if present.
+				$content = rtrim( $content );
+				if ( substr( $content, -2 ) === '?>' ) {
+					$content = substr( $content, 0, -2 ) . "\n" . $new_constant . "\n?>";
+				} else {
+					$content .= "\n" . $new_constant . "\n";
+				}
 			}
 		}
 
@@ -215,8 +245,74 @@ class WpConfigService {
 	 * @return bool
 	 */
 	public function disable_debug_logging(): bool {
-		// On deactivation, we restore original state.
-		return $this->restore_original_state();
+		// Remove only the debug constants we added, don't restore entire file.
+		// This preserves any other changes made to wp-config.php.
+		$results = array();
+
+		// Remove WP_DEBUG if it was set to true by us.
+		// Check if it exists and is true before removing.
+		$content = file_get_contents( $this->wp_config_path );
+		if ( preg_match( "/define\s*\(\s*['\"]WP_DEBUG['\"]\s*,\s*true\s*\)/i", $content ) ) {
+			$results[] = $this->update_constant( 'WP_DEBUG', false );
+		}
+
+		// Remove WP_DEBUG_LOG.
+		$results[] = $this->remove_constant( 'WP_DEBUG_LOG' );
+
+		// Remove WP_DEBUG_DISPLAY.
+		$results[] = $this->remove_constant( 'WP_DEBUG_DISPLAY' );
+
+		// Remove SCRIPT_DEBUG if it was set to true by us.
+		if ( preg_match( "/define\s*\(\s*['\"]SCRIPT_DEBUG['\"]\s*,\s*true\s*\)/i", $content ) ) {
+			$results[] = $this->remove_constant( 'SCRIPT_DEBUG' );
+		}
+
+		return ! in_array( false, $results, true );
+	}
+
+	/**
+	 * Remove a constant from wp-config.php.
+	 *
+	 * @param string $constant_name Constant name to remove.
+	 * @return bool
+	 */
+	private function remove_constant( string $constant_name ): bool {
+		if ( ! file_exists( $this->wp_config_path ) ) {
+			return false;
+		}
+
+		$content = file_get_contents( $this->wp_config_path );
+		$escaped_name = preg_quote( $constant_name, '/' );
+
+		// Remove patterns for the constant definition.
+		$remove_patterns = array(
+			// Pattern for single-line defines with single-quoted strings
+			"/define\s*\(\s*['\"]" . $escaped_name . "['\"]\s*,\s*'[^']*'\s*\)\s*;/i",
+			// Pattern for single-line defines with double-quoted strings
+			"/define\s*\(\s*['\"]" . $escaped_name . "['\"]\s*,\s*\"[^\"]*\"\s*\)\s*;/i",
+			// Pattern for booleans and numbers
+			"/define\s*\(\s*['\"]" . $escaped_name . "['\"]\s*,\s*(?:true|false|\d+)\s*\)\s*;/i",
+			// More aggressive pattern for multiline or complex cases
+			"/define\s*\(\s*['\"]" . $escaped_name . "['\"]\s*,[^;]*?\)\s*;/is",
+		);
+
+		$changed = false;
+		foreach ( $remove_patterns as $pattern ) {
+			$new_content = preg_replace( $pattern, '', $content );
+			if ( $new_content !== $content ) {
+				$content = $new_content;
+				$changed = true;
+			}
+		}
+
+		// Clean up multiple consecutive blank lines.
+		$content = preg_replace( "/\n\s*\n\s*\n+/", "\n\n", $content );
+
+		if ( $changed ) {
+			return false !== file_put_contents( $this->wp_config_path, $content );
+		}
+
+		return true; // Constant didn't exist, which is fine.
 	}
 }
 

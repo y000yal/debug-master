@@ -35,8 +35,16 @@ class SystemInfoController extends BaseController {
 		$php_post_max_size = ini_get( 'post_max_size' );
 		$php_max_input_vars = ini_get( 'max_input_vars' );
 
-		// Get MySQL information.
+		// Get MySQL/Database information.
 		$mysql_version = $wpdb->db_version();
+		$mysql_charset = $wpdb->charset;
+		$mysql_collate = $wpdb->collate;
+		
+		// Get database extension type
+		$db_extension = 'Unknown';
+		if ( is_object( $wpdb->dbh ) ) {
+			$db_extension = get_class( $wpdb->dbh );
+		}
 
 		// Get WordPress information.
 		$wp_version = get_bloginfo( 'version' );
@@ -79,13 +87,17 @@ class SystemInfoController extends BaseController {
 		
 		$php_log_size = 0;
 		$js_log_size = 0;
+		$php_log_exists = false;
+		$js_log_exists = false;
 		
 		if ( ! empty( $php_log_file_path ) && file_exists( $php_log_file_path ) ) {
 			$php_log_size = filesize( $php_log_file_path );
+			$php_log_exists = true;
 		}
 		
 		if ( ! empty( $js_log_file_path ) && file_exists( $js_log_file_path ) ) {
 			$js_log_size = filesize( $js_log_file_path );
+			$js_log_exists = true;
 		}
 		
 		$total_log_size = $php_log_size + $js_log_size;
@@ -101,9 +113,6 @@ class SystemInfoController extends BaseController {
 						'post_max_size'      => $php_post_max_size,
 						'max_input_vars'     => $php_max_input_vars,
 					),
-					'mysql'    => array(
-						'version' => $mysql_version,
-					),
 					'wordpress' => array(
 						'version'         => $wp_version,
 						'memory_limit'    => $wp_memory_limit,
@@ -112,6 +121,10 @@ class SystemInfoController extends BaseController {
 					'server'   => array(
 						'software' => $server_software,
 						'os'       => $server_os,
+						'db_version' => $mysql_version,
+						'db_charset' => $mysql_charset,
+						'db_collate' => $mysql_collate,
+						'db_extension' => $db_extension,
 					),
 					'plugins'  => $plugins_list,
 					'theme'    => $active_theme,
@@ -121,6 +134,8 @@ class SystemInfoController extends BaseController {
 						'total_size'   => size_format( $total_log_size ),
 						'php_log_path' => $php_log_file_path,
 						'js_log_path'  => $js_log_file_path,
+						'php_log_exists' => $php_log_exists,
+						'js_log_exists' => $js_log_exists,
 					),
 				),
 			),

@@ -11,11 +11,12 @@ import {
 	ColumnFiltersState,
 } from '@tanstack/react-table';
 import { LogEntry } from '../types';
-import { Trash, ArrowClockwise, Stack, Code, Browser } from '@phosphor-icons/react';
+import { Trash, ArrowClockwise, Stack, Code, Browser, Download } from '@phosphor-icons/react';
 import api from '../axios/api';
 import { toast } from 'react-toastify';
 import { Modal } from './Modal';
 import { TableSkeleton } from './TableSkeleton';
+import { ExportLogsModal } from './ExportLogsModal';
 
 interface LogsTableProps {
 	entries: LogEntry[];
@@ -38,6 +39,7 @@ export const LogsTable: React.FC< LogsTableProps > = ( {
 	const [ columnFilters, setColumnFilters ] = useState< ColumnFiltersState >( [] );
 	const [ globalFilter, setGlobalFilter ] = useState( '' );
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const [ isExportModalOpen, setIsExportModalOpen ] = useState( false );
 
 	const columns = useMemo< ColumnDef< LogEntry >[] >(
 		() => [
@@ -175,6 +177,14 @@ export const LogsTable: React.FC< LogsTableProps > = ( {
 							onChange={ ( e ) => setGlobalFilter( e.target.value ) }
 							className="debug-master-search"
 						/>
+						<button
+							onClick={ () => setIsExportModalOpen( true ) }
+							className="debug-master-btn debug-master-btn-secondary debug-master-export-btn"
+							title="Export Logs"
+						>
+							<Download size={ 18 } />
+							Export Logs
+						</button>
 					</div>
 					<div className="debug-master-table-actions">
 						<button
@@ -285,6 +295,11 @@ export const LogsTable: React.FC< LogsTableProps > = ( {
 				confirmText="Clear Logs"
 				cancelText="Cancel"
 				confirmButtonClass="debug-master-btn-danger"
+			/>
+			<ExportLogsModal
+				isOpen={ isExportModalOpen }
+				onClose={ () => setIsExportModalOpen( false ) }
+				logType={ logType }
 			/>
 		</>
 	);

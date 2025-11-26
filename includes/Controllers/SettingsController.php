@@ -121,10 +121,27 @@ class SettingsController extends BaseController {
 			'process_non_utc_timezones',
 		);
 
+		$wp_config_service = new WpConfigService();
+		$log_status = get_option( 'debugm_log_status', 'disabled' );
+
 		foreach ( $allowed_settings as $setting ) {
 			if ( isset( $params[ $setting ] ) ) {
 				$value = sanitize_text_field( $params[ $setting ] );
+				$old_value = get_option( 'debugm_' . $setting );
+				
 				update_option( 'debugm_' . $setting, $value, false );
+
+				// If modify_script_debug setting changed and debug logging is enabled, update SCRIPT_DEBUG constant.
+				if ( 'modify_script_debug' === $setting && 'enabled' === $log_status && $old_value !== $value ) {
+					if ( 'enabled' === $value ) {
+						// Enable SCRIPT_DEBUG.
+						$wp_config_service->update_constant( 'SCRIPT_DEBUG', true );
+					} else {
+						// Disable SCRIPT_DEBUG - remove the constant we added.
+						// Only remove if it's set to true (meaning we added it).
+						$wp_config_service->update_constant( 'SCRIPT_DEBUG', false );
+					}
+				}
 			}
 		}
 

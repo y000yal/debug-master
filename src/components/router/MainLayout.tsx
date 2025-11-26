@@ -11,7 +11,15 @@ export const MainLayout: React.FC = () => {
 	// Close menu when clicking outside
 	useEffect( () => {
 		const handleClickOutside = ( event: MouseEvent ) => {
-			if ( menuRef.current && ! menuRef.current.contains( event.target as Node ) ) {
+			const target = event.target as Node;
+			const menuContainer = document.querySelector( '.debug-master-menu-container' );
+			
+			if ( 
+				menuRef.current && 
+				! menuRef.current.contains( target ) &&
+				menuContainer &&
+				! menuContainer.contains( target )
+			) {
 				setIsMenuOpen( false );
 			}
 		};
@@ -35,13 +43,19 @@ export const MainLayout: React.FC = () => {
 		setIsMenuOpen( false );
 	};
 
+	const handleToggleClick = ( e: React.MouseEvent<HTMLButtonElement> ) => {
+		e.stopPropagation();
+		setIsMenuOpen( ! isMenuOpen );
+	};
+
 	return (
 		<div className="debug-master-app">
 			<div className="debug-master-menu-container">
 				<button
 					className="debug-master-floating-menu-toggle"
-					onClick={ () => setIsMenuOpen( ! isMenuOpen ) }
+					onClick={ handleToggleClick }
 					aria-label="Toggle menu"
+					type="button"
 				>
 					{ isMenuOpen ? <X size={ 22 } /> : <List size={ 22 } /> }
 				</button>

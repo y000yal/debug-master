@@ -76,6 +76,19 @@ class DebugLogRoutes extends AbstractRoutes {
 				),
 			)
 		);
+
+		// Export logs endpoint.
+		register_rest_route(
+			$this->namespace . '/' . $this->version . '/',
+			'/' . $this->rest_base . '/export',
+			array(
+				array(
+					'methods'             => 'GET',
+					'permission_callback' => array( $this->middleware, 'authorize' ),
+					'callback'            => array( new DebugLogController(), 'export' ),
+				),
+			)
+		);
 	}
 }
 

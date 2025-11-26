@@ -2,6 +2,13 @@ import React from 'react';
 import { createRoot, Root } from 'react-dom/client';
 import { App } from './App';
 
+// Type declaration for webpack HMR
+declare const module: {
+	hot?: {
+		accept: ( module: string | (() => void), callback?: () => void ) => void;
+	};
+};
+
 let root: Root | null = null;
 
 const render = () => {
@@ -10,16 +17,18 @@ const render = () => {
 		if ( ! root ) {
 			root = createRoot( container );
 		}
-		root.render( React.createElement( App ) );
+		root.render( <App /> );
 	}
 };
 
+// Initial render
 render();
 
-// Enable Hot Module Replacement (HMR) in development.
+// Manual HMR - re-render when App or any of its dependencies change
 if ( module.hot ) {
+	// Accept the App module and all its dependencies
 	module.hot.accept( './App', () => {
-		// Re-render the app when App component changes.
+		// Re-render the app when App or any child component changes
 		render();
 	} );
 }

@@ -3,8 +3,10 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
+import { Tooltip as ReactTooltip } from 'react-tooltip';
 
 import './styles/admin.css';
+import 'react-tooltip/dist/react-tooltip.css';
 import { Router } from './components/router/Router';
 import { IconInjector } from './components/IconInjector';
 
@@ -33,6 +35,7 @@ export const App: React.FC = () => {
 					draggable
 					pauseOnHover
 				/>
+				<ReactTooltip id="debug-master-tooltip" />
 			</HashRouter>
 			<ReactQueryDevtools initialIsOpen={ false } />
 		</QueryClientProvider>

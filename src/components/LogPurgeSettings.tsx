@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../axios/api';
 import { toast } from 'react-toastify';
-import { Trash } from '@phosphor-icons/react';
+import { Trash, Warning } from '@phosphor-icons/react';
+import { Modal } from './Modal';
+import { Tooltip } from './Tooltip';
 
 export const LogPurgeSettings: React.FC = () => {
 	const queryClient = useQueryClient();
@@ -11,6 +13,7 @@ export const LogPurgeSettings: React.FC = () => {
 	const [ beforeDate, setBeforeDate ] = useState( '' );
 	const [ keepNumber, setKeepNumber ] = useState( 7 );
 	const [ keepPeriod, setKeepPeriod ] = useState< 'days' | 'weeks' | 'months' >( 'days' );
+	const [ isModalOpen, setIsModalOpen ] = useState( false );
 
 	const purgeMutation = useMutation( {
 		mutationFn: async ( data: any ) => {
@@ -38,7 +41,7 @@ export const LogPurgeSettings: React.FC = () => {
 		},
 	} );
 
-	const handlePurge = () => {
+	const handlePurgeClick = () => {
 		if ( purgeType === 'before' && ! beforeDate ) {
 			toast.error( 'Please select a date' );
 			return;
@@ -49,98 +52,159 @@ export const LogPurgeSettings: React.FC = () => {
 			return;
 		}
 
-		if ( ! window.confirm( 'Are you sure you want to purge logs? This action cannot be undone.' ) ) {
-			return;
-		}
+		setIsModalOpen( true );
+	};
 
+	const handlePurgeConfirm = () => {
 		if ( purgeType === 'before' ) {
 			purgeMutation.mutate( { beforeDate } );
 		} else {
 			purgeMutation.mutate( { number: keepNumber, period: keepPeriod } );
 		}
+		setIsModalOpen( false );
+	};
+
+	const getPurgeSummary = () => {
+		const logTypeText = logType === 'all' ? 'all logs' : logType === 'php' ? 'PHP logs' : 'JavaScript logs';
+		
+		if ( purgeType === 'before' ) {
+			const dateObj = new Date( beforeDate );
+			const formattedDate = dateObj.toLocaleDateString( 'en-US', { 
+				year: 'numeric', 
+				month: 'long', 
+				day: 'numeric',
+				hour: '2-digit',
+				minute: '2-digit'
+			} );
+			return `Delete all ${ logTypeText } before ${ formattedDate }`;
+		} else {
+			const periodText = keepPeriod === 'days' ? 'day(s)' : keepPeriod === 'weeks' ? 'week(s)' : 'month(s)';
+			return `Keep only the last ${ keepNumber } ${ periodText } of ${ logTypeText }`;
+		}
 	};
 
 	return (
-		<div className="debug-master-settings-section">
-			<div className="debug-master-setting-item">
-				<label>Purge Log Type:</label>
-				<select 
-					className="debug-master-select"
-					value={ logType } 
-					onChange={ ( e ) => setLogType( e.target.value as 'all' | 'php' | 'js' ) }
+		<>
+			<div className="debug-master-settings-section">
+				<div className="debug-master-setting-item">
+					<div className="debug-master-setting-label-wrapper">
+						<label className="debug-master-setting-label">Purge Log Type</label>
+						<Tooltip 
+							content="Choose which log files to purge: All, PHP only, or JavaScript only."
+							position="right"
+						/>
+					</div>
+					<select 
+						className="debug-master-select"
+						value={ logType } 
+						onChange={ ( e ) => setLogType( e.target.value as 'all' | 'php' | 'js' ) }
+					>
+						<option value="all">All Logs</option>
+						<option value="php">PHP Logs Only</option>
+						<option value="js">JavaScript Logs Only</option>
+					</select>
+				</div>
+				
+				<div className="debug-master-purge-options">
+					<div className="debug-master-radio-group">
+						<label className="debug-master-radio-label">
+							<input
+								type="radio"
+								className="debug-master-radio"
+								value="keep"
+								checked={ purgeType === 'keep' }
+								onChange={ ( e ) => setPurgeType( e.target.value as 'keep' ) }
+							/>
+							<span>Keep only logs from last</span>
+							<Tooltip 
+								content="Delete log entries older than the specified time period to manage file size."
+								position="right"
+							/>
+						</label>
+						{ purgeType === 'keep' && (
+							<div className="debug-master-purge-inputs">
+								<input
+									type="number"
+									className="debug-master-input"
+									min="1"
+									value={ keepNumber }
+									onChange={ ( e ) => setKeepNumber( parseInt( e.target.value, 10 ) || 1 ) }
+								/>
+								<select 
+									className="debug-master-select"
+									value={ keepPeriod } 
+									onChange={ ( e ) => setKeepPeriod( e.target.value as 'days' | 'weeks' | 'months' ) }
+								>
+									<option value="days">Days</option>
+									<option value="weeks">Weeks</option>
+									<option value="months">Months</option>
+								</select>
+							</div>
+						) }
+					</div>
+
+					<div className="debug-master-radio-group">
+						<label className="debug-master-radio-label">
+							<input
+								type="radio"
+								className="debug-master-radio"
+								value="before"
+								checked={ purgeType === 'before' }
+								onChange={ ( e ) => setPurgeType( e.target.value as 'before' ) }
+							/>
+							<span>Delete logs before date</span>
+							<Tooltip 
+								content="Permanently delete all log entries before the selected date and time."
+								position="right"
+							/>
+						</label>
+						{ purgeType === 'before' && (
+							<div className="debug-master-purge-inputs">
+								<input
+									type="datetime-local"
+									className="debug-master-input debug-master-datetime-input"
+									value={ beforeDate }
+									onChange={ ( e ) => setBeforeDate( e.target.value ) }
+								/>
+							</div>
+						) }
+					</div>
+				</div>
+
+				<button
+					onClick={ handlePurgeClick }
+					disabled={ purgeMutation.isPending }
+					className="debug-master-btn debug-master-btn-danger"
 				>
-					<option value="all">All Logs</option>
-					<option value="php">PHP Logs Only</option>
-					<option value="js">JavaScript Logs Only</option>
-				</select>
-			</div>
-			<div className="debug-master-purge-options">
-				<div className="debug-master-radio-group">
-					<label className="debug-master-radio-label">
-						<input
-							type="radio"
-							className="debug-master-radio"
-							value="keep"
-							checked={ purgeType === 'keep' }
-							onChange={ ( e ) => setPurgeType( e.target.value as 'keep' ) }
-						/>
-						<span>Keep only logs from last</span>
-					</label>
-					{ purgeType === 'keep' && (
-						<div className="debug-master-purge-inputs">
-							<input
-								type="number"
-								className="debug-master-input"
-								min="1"
-								value={ keepNumber }
-								onChange={ ( e ) => setKeepNumber( parseInt( e.target.value, 10 ) ) }
-							/>
-							<select 
-								className="debug-master-select"
-								value={ keepPeriod } 
-								onChange={ ( e ) => setKeepPeriod( e.target.value as any ) }
-							>
-								<option value="days">Days</option>
-								<option value="weeks">Weeks</option>
-								<option value="months">Months</option>
-							</select>
-						</div>
-					) }
-				</div>
-
-				<div className="debug-master-radio-group">
-					<label className="debug-master-radio-label">
-						<input
-							type="radio"
-							className="debug-master-radio"
-							value="before"
-							checked={ purgeType === 'before' }
-							onChange={ ( e ) => setPurgeType( e.target.value as 'before' ) }
-						/>
-						<span>Delete logs before date</span>
-					</label>
-					{ purgeType === 'before' && (
-						<div className="debug-master-purge-inputs">
-							<input
-								type="datetime-local"
-								className="debug-master-input debug-master-datetime-input"
-								value={ beforeDate }
-								onChange={ ( e ) => setBeforeDate( e.target.value ) }
-							/>
-						</div>
-					) }
-				</div>
+					<Trash size={ 16 } />
+					{ purgeMutation.isPending ? 'Purging...' : 'Purge Logs' }
+				</button>
 			</div>
 
-			<button
-				onClick={ handlePurge }
+			<Modal
+				isOpen={ isModalOpen }
+				onClose={ () => setIsModalOpen( false ) }
+				onConfirm={ handlePurgeConfirm }
+				title="Confirm Purge Logs"
+				confirmText="Purge Logs"
+				cancelText="Cancel"
+				confirmButtonClass="debug-master-btn-danger"
 				disabled={ purgeMutation.isPending }
-				className="debug-master-btn debug-master-btn-danger"
 			>
-				<Trash size={ 16 } />
-				{ purgeMutation.isPending ? 'Purging...' : 'Purge Logs' }
-			</button>
-		</div>
+				<div className="debug-master-purge-confirm-content">
+					<div className="debug-master-purge-warning">
+						<Warning size={ 24 } weight="fill" />
+						<p className="debug-master-purge-warning-text">
+							Are you sure you want to purge logs? This action cannot be undone.
+						</p>
+					</div>
+					<div className="debug-master-purge-summary">
+						<p className="debug-master-purge-summary-label">Summary:</p>
+						<p className="debug-master-purge-summary-text">{ getPurgeSummary() }</p>
+					</div>
+				</div>
+			</Modal>
+		</>
 	);
 };
 

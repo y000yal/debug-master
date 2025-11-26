@@ -6,10 +6,12 @@ interface ModalProps {
 	onClose: () => void;
 	onConfirm: () => void;
 	title: string;
-	message: string;
+	message?: string;
+	children?: React.ReactNode;
 	confirmText?: string;
 	cancelText?: string;
 	confirmButtonClass?: string;
+	disabled?: boolean;
 }
 
 export const Modal: React.FC<ModalProps> = ( {
@@ -18,9 +20,11 @@ export const Modal: React.FC<ModalProps> = ( {
 	onConfirm,
 	title,
 	message,
+	children,
 	confirmText = 'Confirm',
 	cancelText = 'Cancel',
 	confirmButtonClass = 'debug-master-btn-danger',
+	disabled = false,
 } ) => {
 	useEffect( () => {
 		if ( isOpen ) {
@@ -61,18 +65,21 @@ export const Modal: React.FC<ModalProps> = ( {
 					</button>
 				</div>
 				<div className="debug-master-modal-body">
-					<p>{ message }</p>
+					{ message && <p>{ message }</p> }
+					{ children }
 				</div>
 				<div className="debug-master-modal-footer">
 					<button
 						className="debug-master-btn debug-master-btn-secondary"
 						onClick={ onClose }
+						disabled={ disabled }
 					>
 						{ cancelText }
 					</button>
 					<button
 						className={ `debug-master-btn ${ confirmButtonClass }` }
 						onClick={ onConfirm }
+						disabled={ disabled }
 					>
 						{ confirmText }
 					</button>

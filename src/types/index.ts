@@ -15,6 +15,7 @@ export interface Settings {
 	modify_script_debug: string;
 	process_non_utc_timezones: string;
 	log_file_path: string;
+	js_log_file_path: string;
 }
 
 export interface LogsResponse {

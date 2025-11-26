@@ -7,6 +7,7 @@ import { LogPurgeSettings } from './LogPurgeSettings';
 import { StatusIndicator } from './StatusIndicator';
 import { Toggle } from './Toggle';
 import { Spinner } from './Spinner';
+import { Tooltip } from './Tooltip';
 
 export const SettingsPanel: React.FC = () => {
 	const queryClient = useQueryClient();
@@ -62,6 +63,10 @@ export const SettingsPanel: React.FC = () => {
 	} );
 
 	const handleSettingUpdate = ( settingKey: keyof Settings, currentValue: string ) => {
+		// Prevent multiple clicks if this specific setting is already updating
+		if ( updatingSetting === settingKey || updateSettingsMutation.isPending || toggleLoggingMutation.isPending ) {
+			return;
+		}
 		setUpdatingSetting( settingKey );
 		updateSettingsMutation.mutate( {
 			[ settingKey ]: currentValue === 'enabled' ? 'disabled' : 'enabled',
@@ -77,84 +82,102 @@ export const SettingsPanel: React.FC = () => {
 	}
 
 	const currentSettings = settings.data;
+	const isLoggingEnabled = currentSettings.log_status === 'enabled';
 
 	return (
 		<div className="debug-master-screen">
 			<div className="debug-master-settings">
 				<div className="debug-master-settings-section">
-					<StatusIndicator
-						status={ currentSettings.log_status }
-						onToggle={ () => toggleLoggingMutation.mutate() }
-						loading={ toggleLoggingMutation.isPending }
-					/>
-				</div>
-
-				<div className="debug-master-settings-section">
-					<div className="debug-master-setting-item">
-					<div className="debug-master-setting-row">
-						<label>Auto-refresh logs</label>
-						<div className="debug-master-toggle-wrapper">
-							{ updatingSetting === 'autorefresh' && (
-								<div className="debug-master-toggle-loader">
-									<Spinner />
-								</div>
-							) }
-							<Toggle
-								checked={ currentSettings.autorefresh === 'enabled' }
-								onChange={ () => handleSettingUpdate( 'autorefresh', currentSettings.autorefresh ) }
-								disabled={ updatingSetting === 'autorefresh' }
-							/>
-						</div>
-					</div>
-				</div>
-				<div className="debug-master-setting-item">
-					<div className="debug-master-setting-row">
-						<label>Log JavaScript errors</label>
-						<div className="debug-master-toggle-wrapper">
-							{ updatingSetting === 'js_error_logging' && (
-								<div className="debug-master-toggle-loader">
-									<Spinner />
-								</div>
-							) }
-							<Toggle
-								checked={ currentSettings.js_error_logging === 'enabled' }
-								onChange={ () => handleSettingUpdate( 'js_error_logging', currentSettings.js_error_logging ) }
-								disabled={ updatingSetting === 'js_error_logging' }
-							/>
-						</div>
-					</div>
-				</div>
-				<div className="debug-master-setting-item">
-					<div className="debug-master-setting-row">
-						<label>Modify SCRIPT_DEBUG</label>
-						<div className="debug-master-toggle-wrapper">
-							{ updatingSetting === 'modify_script_debug' && (
-								<div className="debug-master-toggle-loader">
-									<Spinner />
-								</div>
-							) }
-							<Toggle
-								checked={ currentSettings.modify_script_debug === 'enabled' }
-								onChange={ () => handleSettingUpdate( 'modify_script_debug', currentSettings.modify_script_debug ) }
-								disabled={ updatingSetting === 'modify_script_debug' }
-							/>
-						</div>
-					</div>
-				</div>
-				</div>
-
-				<div className="debug-master-settings-section">
-					<div className="debug-master-setting-item">
-						<label>PHP Log File Path:</label>
-						<code className="debug-master-file-path">{ currentSettings.log_file_path || 'Not set' }</code>
-					</div>
-					<div className="debug-master-setting-item">
-						<label>JavaScript Log File Path:</label>
-						<code className="debug-master-file-path">{ currentSettings.js_log_file_path || 'Not set' }</code>
+					<div className="debug-master-setting-header">
+						<StatusIndicator
+							status={ currentSettings.log_status }
+							onToggle={ () => toggleLoggingMutation.mutate() }
+							loading={ toggleLoggingMutation.isPending }
+						/>
+						<Tooltip 
+							content="Enable/disable WordPress debug logging. Updates WP_DEBUG constants in wp-config.php."
+							position="right"
+						/>
 					</div>
 				</div>
 
-				<LogPurgeSettings />
+				{ isLoggingEnabled && (
+					<>
+						<div className="debug-master-settings-section">
+							<div className="debug-master-setting-item">
+							<div className="debug-master-setting-row">
+								<div className="debug-master-setting-label-wrapper">
+									<label>Auto-refresh logs</label>
+									<Tooltip 
+										content="Automatically refresh logs every 10 seconds to show new entries in real-time."
+										position="right"
+									/>
+								</div>
+								<div className="debug-master-toggle-wrapper">
+									<Toggle
+										checked={ currentSettings.autorefresh === 'enabled' }
+										onChange={ () => handleSettingUpdate( 'autorefresh', currentSettings.autorefresh ) }
+										disabled={ updatingSetting === 'autorefresh' || toggleLoggingMutation.isPending }
+									/>
+									{ updatingSetting === 'autorefresh' && (
+										<div className="debug-master-toggle-loader">
+											<Spinner />
+										</div>
+									) }
+								</div>
+							</div>
+						</div>
+						<div className="debug-master-setting-item">
+							<div className="debug-master-setting-row">
+								<div className="debug-master-setting-label-wrapper">
+									<label>Log JavaScript errors</label>
+									<Tooltip 
+										content="Capture and log JavaScript errors from the frontend to a separate log file."
+										position="right"
+									/>
+								</div>
+								<div className="debug-master-toggle-wrapper">
+									<Toggle
+										checked={ currentSettings.js_error_logging === 'enabled' }
+										onChange={ () => handleSettingUpdate( 'js_error_logging', currentSettings.js_error_logging ) }
+										disabled={ updatingSetting === 'js_error_logging' || toggleLoggingMutation.isPending }
+									/>
+									{ updatingSetting === 'js_error_logging' && (
+										<div className="debug-master-toggle-loader">
+											<Spinner />
+										</div>
+									) }
+								</div>
+							</div>
+						</div>
+						<div className="debug-master-setting-item">
+							<div className="debug-master-setting-row">
+								<div className="debug-master-setting-label-wrapper">
+									<label>Modify SCRIPT_DEBUG</label>
+									<Tooltip 
+										content="Controls SCRIPT_DEBUG in wp-config.php. Enables non-minified JS/CSS for easier debugging."
+										position="right"
+									/>
+								</div>
+								<div className="debug-master-toggle-wrapper">
+									<Toggle
+										checked={ currentSettings.modify_script_debug === 'enabled' }
+										onChange={ () => handleSettingUpdate( 'modify_script_debug', currentSettings.modify_script_debug ) }
+										disabled={ updatingSetting === 'modify_script_debug' || toggleLoggingMutation.isPending }
+									/>
+									{ updatingSetting === 'modify_script_debug' && (
+										<div className="debug-master-toggle-loader">
+											<Spinner />
+										</div>
+									) }
+								</div>
+							</div>
+						</div>
+						</div>
+
+						<LogPurgeSettings />
+					</>
+				) }
 			</div>
 		</div>
 	);

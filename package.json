@@ -11,7 +11,10 @@
     "start": "cross-env NODE_ENV=development webpack serve --mode development",
     "phpcs": "composer exec phpcs -- --standard=phpcs.xml",
     "phpcs:fix": "composer exec phpcbf -- --standard=phpcs.xml",
-    "lint": "npm run phpcs"
+    "lint": "npm run phpcs",
+    "quality": "grunt quality",
+    "precommit": "grunt precommit",
+    "release": "grunt release"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.7",
@@ -36,6 +39,7 @@
     "@babel/preset-env": "^7.27.1",
     "@babel/preset-react": "^7.27.1",
     "@babel/preset-typescript": "^7.27.1",
+    "@pmmmwh/react-refresh-webpack-plugin": "^0.5.15",
     "@tailwindcss/postcss": "^4.1.5",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.3",
@@ -43,9 +47,26 @@
     "babel-loader": "^10.0.0",
     "cross-env": "^7.0.3",
     "css-loader": "^7.1.2",
+    "grunt": "^1.6.1",
+    "grunt-contrib-clean": "^2.0.1",
+    "grunt-contrib-compress": "^2.0.0",
+    "grunt-contrib-concat": "^2.1.0",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-cssmin": "^5.0.0",
+    "grunt-contrib-jshint": "^3.2.0",
+    "grunt-contrib-uglify": "^5.2.2",
+    "grunt-contrib-watch": "^1.1.0",
+    "grunt-phpcs": "^0.1.1",
+    "grunt-postcss": "^0.9.0",
+    "grunt-rtlcss": "^2.0.2",
+    "grunt-sass": "^4.0.1",
+    "grunt-shell": "^4.0.0",
+    "grunt-stylelint": "^0.20.1",
     "mini-css-extract-plugin": "^2.9.2",
     "postcss": "^8.5.3",
     "postcss-loader": "^8.1.1",
+    "react-refresh": "^0.14.2",
+    "sass": "^1.94.2",
     "style-loader": "^4.0.0",
     "tailwindcss": "^4.1.5",
     "typescript": "^5.8.3",
@@ -55,4 +76,3 @@
     "webpackbar": "^7.0.0"
   }
 }
-
