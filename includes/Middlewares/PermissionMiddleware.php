@@ -39,4 +39,3 @@ class PermissionMiddleware {
 		return true;
 	}
 }
-

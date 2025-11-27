@@ -77,4 +77,3 @@ class SettingsRoutes extends AbstractRoutes {
 		);
 	}
 }
-

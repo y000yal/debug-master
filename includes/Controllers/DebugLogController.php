@@ -41,7 +41,7 @@ class DebugLogController extends BaseController {
 	 */
 	public function index( WP_Rest_Request $request ): WP_REST_Response {
 		$log_type = $request->get_param( 'type' ); // 'php', 'js', or 'all'
-		
+
 		$php_log_file_path = get_option( 'debugm_log_file_path', '' );
 		$js_log_file_path  = get_option( 'debugm_js_log_file_path', '' );
 
@@ -55,7 +55,7 @@ class DebugLogController extends BaseController {
 			$php_entries = $this->log_service->get_processed_entries( $php_log_file_path );
 			$php_count = count( $php_entries );
 			$total_file_size_bytes += filesize( $php_log_file_path );
-			
+
 			// Mark entries as PHP type.
 			foreach ( $php_entries as $key => $entry ) {
 				$php_entries[ $key ]['log_type'] = 'php';
@@ -68,7 +68,7 @@ class DebugLogController extends BaseController {
 			$js_entries = $this->log_service->get_processed_entries( $js_log_file_path );
 			$js_count = count( $js_entries );
 			$total_file_size_bytes += filesize( $js_log_file_path );
-			
+
 			// Mark entries as JS type.
 			foreach ( $js_entries as $key => $entry ) {
 				$js_entries[ $key ]['log_type'] = 'js';
@@ -77,11 +77,14 @@ class DebugLogController extends BaseController {
 		}
 
 		// Sort by timestamp (most recent first).
-		usort( $all_entries, function( $a, $b ) {
-			$a_latest = ! empty( $a['occurrences'] ) ? end( $a['occurrences'] ) : '';
-			$b_latest = ! empty( $b['occurrences'] ) ? end( $b['occurrences'] ) : '';
-			return strcmp( $b_latest, $a_latest );
-		} );
+		usort(
+			$all_entries,
+			function ( $a, $b ) {
+				$a_latest = ! empty( $a['occurrences'] ) ? end( $a['occurrences'] ) : '';
+				$b_latest = ! empty( $b['occurrences'] ) ? end( $b['occurrences'] ) : '';
+				return strcmp( $b_latest, $a_latest );
+			}
+		);
 
 		return $this->response(
 			array(
@@ -103,7 +106,7 @@ class DebugLogController extends BaseController {
 	 */
 	public function clear( WP_Rest_Request $request ): WP_REST_Response {
 		$log_type = $request->get_param( 'type' ); // 'php', 'js', or 'all'
-		
+
 		if ( empty( $log_type ) ) {
 			$log_type = 'all';
 		}
@@ -208,7 +211,7 @@ class DebugLogController extends BaseController {
 
 		// Get JS log file path.
 		$js_log_file_path = get_option( 'debugm_js_log_file_path', '' );
-		
+
 		if ( empty( $js_log_file_path ) ) {
 			return $this->response(
 				array(
@@ -323,6 +326,7 @@ class DebugLogController extends BaseController {
 		header( 'Pragma: no-cache' );
 		header( 'Expires: 0' );
 
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Export content is raw log data.
 		echo $export_content;
 		exit;
 	}
@@ -330,8 +334,8 @@ class DebugLogController extends BaseController {
 	/**
 	 * Get export content from log file based on export type.
 	 *
-	 * @param string $log_file_path Path to log file.
-	 * @param string $export_type Export type: 'date-range' or 'entire-file'.
+	 * @param string      $log_file_path Path to log file.
+	 * @param string      $export_type Export type: 'date-range' or 'entire-file'.
 	 * @param string|null $start_date Start date for date range export.
 	 * @param string|null $end_date End date for date range export.
 	 * @return string
@@ -356,7 +360,7 @@ class DebugLogController extends BaseController {
 			$end_timestamp = strtotime( $end_date . ' 23:59:59' );
 
 			foreach ( $lines as $line ) {
-				// Extract timestamp from log line: [DD-MMM-YYYY HH:MM:SS UTC]
+				// Extract timestamp from log line: [DD-MMM-YYYY HH:MM:SS UTC].
 				if ( preg_match( '/\[(\d{2}-[A-Za-z]{3}-\d{4} \d{2}:\d{2}:\d{2} [^\]]+)\]/', $line, $matches ) ) {
 					$log_timestamp = strtotime( $matches[1] );
 					if ( $log_timestamp >= $start_timestamp && $log_timestamp <= $end_timestamp ) {
@@ -371,4 +375,3 @@ class DebugLogController extends BaseController {
 		return '';
 	}
 }
-

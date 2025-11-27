@@ -15,4 +15,3 @@ defined( 'ABSPATH' ) || exit;
 function debugm_get_instance(): DebugMaster {
 	return DebugMaster::instance();
 }
-

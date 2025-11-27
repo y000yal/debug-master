@@ -43,7 +43,7 @@ class LogPurgeController extends BaseController {
 		$params        = $request->get_json_params();
 		$before_date   = isset( $params['before_date'] ) ? sanitize_text_field( $params['before_date'] ) : '';
 		$log_type      = isset( $params['log_type'] ) ? sanitize_text_field( $params['log_type'] ) : 'all';
-		
+
 		if ( empty( $before_date ) ) {
 			return $this->response(
 				array(
@@ -158,4 +158,3 @@ class LogPurgeController extends BaseController {
 		);
 	}
 }
-

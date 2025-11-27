@@ -86,7 +86,7 @@ export const SystemInfoScreen: React.FC = () => {
                 {/* PHP Card */}
                 <div className="debug-master-mosaic-card debug-master-card-large">
                     <div className="debug-master-card-header">
-                        <h2>PHP Configuration</h2>
+                        <h2>PHP Configurations</h2>
                     </div>
                     <div className="debug-master-card-content">
                         <div className="debug-master-stat-grid">
@@ -204,7 +204,7 @@ export const SystemInfoScreen: React.FC = () => {
                     <div className="debug-master-card-content">
                         <div className="debug-master-stat-grid">
                             <div className="debug-master-stat-item">
-                                <span className="debug-master-stat-label">Software</span>
+                                <span className="debug-master-stat-label">Softwares</span>
                                 <span className="debug-master-stat-value">{systemInfo.server.software}</span>
                             </div>
                             <div className="debug-master-stat-item">

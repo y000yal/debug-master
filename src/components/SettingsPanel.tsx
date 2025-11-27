@@ -94,10 +94,6 @@ export const SettingsPanel: React.FC = () => {
 							onToggle={ () => toggleLoggingMutation.mutate() }
 							loading={ toggleLoggingMutation.isPending }
 						/>
-						<Tooltip 
-							content="Enable/disable WordPress debug logging. Updates WP_DEBUG constants in wp-config.php."
-							position="right"
-						/>
 					</div>
 				</div>
 

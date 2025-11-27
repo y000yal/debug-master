@@ -25,7 +25,6 @@ Debug Master provides a modern, React-based interface for managing WordPress deb
 * Toggle debug logging with one click
 * JavaScript error logging support
 * Secure log file location
-* Hot reload support for development
 
 == Installation ==
 
@@ -39,10 +38,6 @@ Debug Master provides a modern, React-based interface for managing WordPress deb
 
 It should work with most managed hosts. If you encounter issues, please report them.
 
-= How do I enable hot reload for development? =
-
-1. Run `npm run hot` in the plugin directory
-2. Add `define( 'DEBUGM_HOT_RELOAD', true );` to your wp-config.php
 
 == Changelog ==
 

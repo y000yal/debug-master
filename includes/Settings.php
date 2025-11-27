@@ -29,6 +29,24 @@ class Settings {
 	}
 
 	/**
+	 * Returns a base64 URL for the SVG for use in the menu.
+	 *
+	 * @param  bool $base64 Whether or not to return base64-encoded SVG.
+	 * @return string
+	 */
+	private function get_icon_svg( $base64 = true ) {
+		$svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">' .
+			'<text x="16" y="22" font-family="Arial, sans-serif" font-size="18" ' .
+			'font-weight="bold" fill="#82878c" text-anchor="middle">DM</text></svg>';
+
+		if ( $base64 ) {
+			return 'data:image/svg+xml;base64,' . base64_encode( $svg );
+		}
+
+		return $svg;
+	}
+
+	/**
 	 * Register the admin menu for Debug Master.
 	 */
 	public function register_menu(): void {
@@ -38,7 +56,7 @@ class Settings {
 			'manage_options',
 			'debug-master',
 			array( $this, 'render_page' ),
-			'dashicons-bug',
+			$this->get_icon_svg(),
 			60
 		);
 	}
@@ -54,14 +72,13 @@ class Settings {
 			if ( ! empty( $php_log_file_path ) ) {
 				$js_log_file_path = str_replace( '_debug.log', '_js_debug.log', $php_log_file_path );
 				update_option( 'debugm_js_log_file_path', $js_log_file_path, false );
-				
+
 				// Create the file if it doesn't exist.
 				if ( ! is_file( $js_log_file_path ) ) {
 					file_put_contents( $js_log_file_path, '' );
 				}
 			}
 		}
-
 
 		echo '<div id="debug-master-admin-app"></div>';
 	}
@@ -149,7 +166,7 @@ class Settings {
 			if ( ! empty( $php_log_file_path ) ) {
 				$js_log_file_path = str_replace( '_debug.log', '_js_debug.log', $php_log_file_path );
 				update_option( 'debugm_js_log_file_path', $js_log_file_path, false );
-				
+
 				// Create the file if it doesn't exist.
 				if ( ! is_file( $js_log_file_path ) ) {
 					file_put_contents( $js_log_file_path, '' );
@@ -259,8 +276,8 @@ class Settings {
 			file_put_contents( $uploads_path . '/index.php', '<?php // Nothing to show here' );
 		}
 
-		$plain_domain = str_replace( array( '.', '-' ), '', sanitize_text_field( $_SERVER['SERVER_NAME'] ?? 'localhost' ) );
-		$unique_key   = date( 'YmdHi' ) . wp_rand( 12345678, 87654321 );
+		$plain_domain = str_replace( array( '.', '-' ), '', sanitize_text_field( wp_unslash( $_SERVER['SERVER_NAME'] ?? 'localhost' ) ) );
+		$unique_key   = gmdate( 'YmdHi' ) . wp_rand( 12345678, 87654321 );
 		$log_file_path = trailingslashit( $uploads_path ) . $plain_domain . '_' . $unique_key . '_debug.log';
 		$js_log_file_path = trailingslashit( $uploads_path ) . $plain_domain . '_' . $unique_key . '_js_debug.log';
 
@@ -298,4 +315,3 @@ class Settings {
 		}
 	}
 }
-

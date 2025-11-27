@@ -69,12 +69,12 @@ class SettingsController extends BaseController {
 			}
 
 			$modify_script_debug = 'enabled' === get_option( 'debugm_modify_script_debug', 'enabled' );
-			
+
 			// Ensure log file path is absolute.
 			if ( ! $wp_config_service->is_absolute_path( $log_file_path ) ) {
 				$log_file_path = ABSPATH . ltrim( $log_file_path, '/' );
 			}
-			
+
 			$enabled = $wp_config_service->enable_debug_logging( $log_file_path, $modify_script_debug );
 
 			if ( ! $enabled ) {
@@ -128,7 +128,7 @@ class SettingsController extends BaseController {
 			if ( isset( $params[ $setting ] ) ) {
 				$value = sanitize_text_field( $params[ $setting ] );
 				$old_value = get_option( 'debugm_' . $setting );
-				
+
 				update_option( 'debugm_' . $setting, $value, false );
 
 				// If modify_script_debug setting changed and debug logging is enabled, update SCRIPT_DEBUG constant.
@@ -154,4 +154,3 @@ class SettingsController extends BaseController {
 		);
 	}
 }
-

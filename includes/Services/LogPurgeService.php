@@ -139,7 +139,7 @@ class LogPurgeService {
 				$cutoff = $now;
 		}
 
-		return date( 'Y-m-d H:i:s', $cutoff );
+		return gmdate( 'Y-m-d H:i:s', $cutoff );
 	}
 
 	/**
@@ -168,4 +168,3 @@ class LogPurgeService {
 		return false !== $parsed ? $parsed : false;
 	}
 }
-

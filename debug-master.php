@@ -2,7 +2,7 @@
 
 /**
  * Plugin Name: Debug Master
- * Plugin URI: https://debugmaster.com/
+ * Plugin URI: https://brutefort.com/products/debug-master
  * Description: Modern debug log management for WordPress with React interface, log purging, and advanced filtering.
  * Version: 1.0.0
  * Author: Y0000el
@@ -231,4 +231,3 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/helpers.php';
 
 // Set global.
 $GLOBALS['debugmaster'] = debugm_get_instance();
-

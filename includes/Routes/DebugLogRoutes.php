@@ -91,4 +91,3 @@ class DebugLogRoutes extends AbstractRoutes {
 		);
 	}
 }
-

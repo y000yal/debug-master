@@ -39,8 +39,8 @@ class SystemInfoController extends BaseController {
 		$mysql_version = $wpdb->db_version();
 		$mysql_charset = $wpdb->charset;
 		$mysql_collate = $wpdb->collate;
-		
-		// Get database extension type
+
+		// Get database extension type.
 		$db_extension = 'Unknown';
 		if ( is_object( $wpdb->dbh ) ) {
 			$db_extension = get_class( $wpdb->dbh );
@@ -69,9 +69,12 @@ class SystemInfoController extends BaseController {
 		}
 
 		// Sort plugins by name.
-		usort( $plugins_list, function( $a, $b ) {
-			return strcmp( $a['name'], $b['name'] );
-		} );
+		usort(
+			$plugins_list,
+			function ( $a, $b ) {
+				return strcmp( $a['name'], $b['name'] );
+			}
+		);
 
 		// Get active theme.
 		$theme = wp_get_theme();
@@ -84,22 +87,22 @@ class SystemInfoController extends BaseController {
 		// Get debug log file information.
 		$php_log_file_path = get_option( 'debugm_log_file_path', '' );
 		$js_log_file_path  = get_option( 'debugm_js_log_file_path', '' );
-		
+
 		$php_log_size = 0;
 		$js_log_size = 0;
 		$php_log_exists = false;
 		$js_log_exists = false;
-		
+
 		if ( ! empty( $php_log_file_path ) && file_exists( $php_log_file_path ) ) {
 			$php_log_size = filesize( $php_log_file_path );
 			$php_log_exists = true;
 		}
-		
+
 		if ( ! empty( $js_log_file_path ) && file_exists( $js_log_file_path ) ) {
 			$js_log_size = filesize( $js_log_file_path );
 			$js_log_exists = true;
 		}
-		
+
 		$total_log_size = $php_log_size + $js_log_size;
 
 		return $this->response(
@@ -143,4 +146,3 @@ class SystemInfoController extends BaseController {
 		);
 	}
 }
-

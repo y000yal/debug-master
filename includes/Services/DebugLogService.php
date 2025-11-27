@@ -87,14 +87,15 @@ class DebugLogService {
 		// Normalize line endings.
 		$content = str_replace( array( "\r\n", "\r" ), "\n", $content );
 
-		// Split by timestamp pattern: [DD-MMM-YYYY HH:MM:SS UTC]
+		// Split by timestamp pattern: [DD-MMM-YYYY HH:MM:SS UTC].
 		$pattern = '/\[(\d{2}-[A-Za-z]{3}-\d{4} \d{2}:\d{2}:\d{2} [^\]]+)\]/';
 		$parts   = preg_split( $pattern, $content, -1, PREG_SPLIT_DELIM_CAPTURE );
 
 		$entries = array();
 		$i       = 1;
+		$parts_count = count( $parts );
 
-		while ( $i < count( $parts ) ) {
+		while ( $i < $parts_count ) {
 			if ( isset( $parts[ $i ] ) && isset( $parts[ $i + 1 ] ) ) {
 				$timestamp = $parts[ $i ];
 				$message   = trim( $parts[ $i + 1 ] );
@@ -153,30 +154,22 @@ class DebugLogService {
 	private function detect_error_source( string $message ): string {
 		// Extract file path from error message (common patterns).
 		$file_path = '';
-		
-		// Pattern 1: "in /path/to/file.php on line X"
+
+		// Pattern 1: "in /path/to/file.php on line X".
 		if ( preg_match( '/\s+in\s+([^\s]+\.php)\s+on\s+line\s+\d+/i', $message, $matches ) ) {
 			$file_path = $matches[1];
-		}
-		// Pattern 2: "in /path/to/file.php:X"
-		elseif ( preg_match( '/\s+in\s+([^\s]+\.php):(\d+)/i', $message, $matches ) ) {
+		} elseif ( preg_match( '/\s+in\s+([^\s]+\.php):(\d+)/i', $message, $matches ) ) { // Pattern 2: "in /path/to/file.php:X".
 			$file_path = $matches[1];
-		}
-		// Pattern 3: "/path/to/file.php on line X"
-		elseif ( preg_match( '/([\/\\\\][^\s]+\.php)\s+on\s+line\s+\d+/i', $message, $matches ) ) {
+		} elseif ( preg_match( '/([\/\\\\][^\s]+\.php)\s+on\s+line\s+\d+/i', $message, $matches ) ) { // Pattern 3: "/path/to/file.php on line X".
 			$file_path = $matches[1];
-		}
-		// Pattern 4: Check for ABSPATH patterns directly in message.
-		elseif ( strpos( $message, ABSPATH ) !== false ) {
+		} elseif ( strpos( $message, ABSPATH ) !== false ) { // Pattern 4: Check for ABSPATH patterns directly in message.
 			// Extract path after ABSPATH.
 			$abspath_pos = strpos( $message, ABSPATH );
 			$path_start = substr( $message, $abspath_pos + strlen( ABSPATH ) );
 			if ( preg_match( '/([^\s]+\.php)/', $path_start, $matches ) ) {
 				$file_path = ABSPATH . $matches[1];
 			}
-		}
-		// Pattern 5: JavaScript errors - check for script paths.
-		elseif ( preg_match( '/\s+in\s+([^\s]+\.js)/i', $message, $matches ) ) {
+		} elseif ( preg_match( '/\s+in\s+([^\s]+\.js)/i', $message, $matches ) ) { // Pattern 5: JavaScript errors - check for script paths.
 			$file_path = $matches[1];
 		}
 
@@ -189,12 +182,10 @@ class DebugLogService {
 			$theme_root_normalized = str_replace( array( '\\', '/' ), DIRECTORY_SEPARATOR, get_theme_root() );
 
 			// Check for WordPress Core.
-			if ( strpos( $file_path, $abspath_normalized . 'wp-admin' ) !== false || 
+			if ( strpos( $file_path, $abspath_normalized . 'wp-admin' ) !== false ||
 				 strpos( $file_path, $abspath_normalized . 'wp-includes' ) !== false ) {
 				return 'WordPress Core';
-			}
-			// Check for Plugin.
-			elseif ( strpos( $file_path, $wp_plugin_dir_normalized ) !== false ) {
+			} elseif ( strpos( $file_path, $wp_plugin_dir_normalized ) !== false ) { // Check for Plugin.
 				// Try to extract plugin name.
 				$plugin_path = str_replace( $wp_plugin_dir_normalized . DIRECTORY_SEPARATOR, '', $file_path );
 				$plugin_dir = explode( DIRECTORY_SEPARATOR, $plugin_path );
@@ -208,9 +199,7 @@ class DebugLogService {
 					return 'Plugin: ' . $plugin_dir[0];
 				}
 				return 'Plugin';
-			}
-			// Check for Theme.
-			elseif ( strpos( $file_path, $theme_root_normalized ) !== false ) {
+			} elseif ( strpos( $file_path, $theme_root_normalized ) !== false ) { // Check for Theme.
 				// Try to extract theme name.
 				$theme_path = str_replace( $theme_root_normalized . DIRECTORY_SEPARATOR, '', $file_path );
 				$theme_dir = explode( DIRECTORY_SEPARATOR, $theme_path );
@@ -227,17 +216,17 @@ class DebugLogService {
 
 		// Fallback: Check message content for common indicators.
 		$message_lower = strtolower( $message );
-		
+
 		// Check for JavaScript errors.
-		if ( strpos( $message_lower, 'javascript' ) !== false || 
+		if ( strpos( $message_lower, 'javascript' ) !== false ||
 			 strpos( $message, '.js' ) !== false ||
 			 strpos( $message, 'window.' ) !== false ||
 			 strpos( $message, 'document.' ) !== false ) {
 			return 'JavaScript';
 		}
-		
+
 		// Check for database errors.
-		if ( strpos( $message_lower, 'database' ) !== false || 
+		if ( strpos( $message_lower, 'database' ) !== false ||
 			 strpos( $message_lower, 'mysql' ) !== false ||
 			 strpos( $message_lower, 'wpdb' ) !== false ) {
 			return 'Database';
@@ -281,7 +270,7 @@ class DebugLogService {
 		// Sort by most recent occurrence.
 		usort(
 			$grouped,
-			function( $a, $b ) {
+			function ( $a, $b ) {
 				$a_latest = end( $a['occurrences'] );
 				$b_latest = end( $b['occurrences'] );
 				return strcmp( $b_latest, $a_latest );
@@ -319,4 +308,3 @@ class DebugLogService {
 		return size_format( filesize( $log_file_path ) );
 	}
 }
-

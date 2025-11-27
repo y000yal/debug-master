@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import { Trash, Warning } from '@phosphor-icons/react';
 import { Modal } from './Modal';
 import { Tooltip } from './Tooltip';
+import { Toggle } from './Toggle';
 
 export const LogPurgeSettings: React.FC = () => {
 	const queryClient = useQueryClient();
@@ -87,87 +88,89 @@ export const LogPurgeSettings: React.FC = () => {
 		<>
 			<div className="debug-master-settings-section">
 				<div className="debug-master-setting-item">
-					<div className="debug-master-setting-label-wrapper">
-						<label className="debug-master-setting-label">Purge Log Type</label>
-						<Tooltip 
-							content="Choose which log files to purge: All, PHP only, or JavaScript only."
-							position="right"
-						/>
+					<div className="debug-master-setting-row">
+						<div className="debug-master-setting-label-wrapper">
+							<label>Purge Log Type</label>
+							<Tooltip 
+								content="Choose which log files to purge: All, PHP only, or JavaScript only."
+								position="right"
+							/>
+						</div>
+						<select 
+							className="debug-master-select"
+							value={ logType } 
+							onChange={ ( e ) => setLogType( e.target.value as 'all' | 'php' | 'js' ) }
+						>
+							<option value="all">All Logs</option>
+							<option value="php">PHP Logs Only</option>
+							<option value="js">JavaScript Logs Only</option>
+						</select>
 					</div>
-					<select 
-						className="debug-master-select"
-						value={ logType } 
-						onChange={ ( e ) => setLogType( e.target.value as 'all' | 'php' | 'js' ) }
-					>
-						<option value="all">All Logs</option>
-						<option value="php">PHP Logs Only</option>
-						<option value="js">JavaScript Logs Only</option>
-					</select>
 				</div>
 				
-				<div className="debug-master-purge-options">
-					<div className="debug-master-radio-group">
-						<label className="debug-master-radio-label">
-							<input
-								type="radio"
-								className="debug-master-radio"
-								value="keep"
-								checked={ purgeType === 'keep' }
-								onChange={ ( e ) => setPurgeType( e.target.value as 'keep' ) }
-							/>
-							<span>Keep only logs from last</span>
+				<div className="debug-master-setting-item">
+					<div className="debug-master-setting-row">
+						<div className="debug-master-setting-label-wrapper">
+							<label>Keep only logs from last</label>
 							<Tooltip 
 								content="Delete log entries older than the specified time period to manage file size."
 								position="right"
 							/>
-						</label>
-						{ purgeType === 'keep' && (
-							<div className="debug-master-purge-inputs">
-								<input
-									type="number"
-									className="debug-master-input"
-									min="1"
-									value={ keepNumber }
-									onChange={ ( e ) => setKeepNumber( parseInt( e.target.value, 10 ) || 1 ) }
-								/>
-								<select 
-									className="debug-master-select"
-									value={ keepPeriod } 
-									onChange={ ( e ) => setKeepPeriod( e.target.value as 'days' | 'weeks' | 'months' ) }
-								>
-									<option value="days">Days</option>
-									<option value="weeks">Weeks</option>
-									<option value="months">Months</option>
-								</select>
-							</div>
-						) }
-					</div>
-
-					<div className="debug-master-radio-group">
-						<label className="debug-master-radio-label">
-							<input
-								type="radio"
-								className="debug-master-radio"
-								value="before"
-								checked={ purgeType === 'before' }
-								onChange={ ( e ) => setPurgeType( e.target.value as 'before' ) }
+						</div>
+						<div className="debug-master-toggle-wrapper debug-master-toggle-wrapper-column">
+							<Toggle
+								checked={ purgeType === 'keep' }
+								onChange={ () => setPurgeType( purgeType === 'keep' ? 'before' : 'keep' ) }
 							/>
-							<span>Delete logs before date</span>
+							{ purgeType === 'keep' && (
+								<div className="debug-master-purge-inputs">
+									<input
+										type="number"
+										className="debug-master-input"
+										min="1"
+										value={ keepNumber }
+										onChange={ ( e ) => setKeepNumber( parseInt( e.target.value, 10 ) || 1 ) }
+									/>
+									<select 
+										className="debug-master-select"
+										value={ keepPeriod } 
+										onChange={ ( e ) => setKeepPeriod( e.target.value as 'days' | 'weeks' | 'months' ) }
+									>
+										<option value="days">Days</option>
+										<option value="weeks">Weeks</option>
+										<option value="months">Months</option>
+									</select>
+								</div>
+							) }
+						</div>
+					</div>
+				</div>
+
+				<div className="debug-master-setting-item">
+					<div className="debug-master-setting-row">
+						<div className="debug-master-setting-label-wrapper">
+							<label>Delete logs before date</label>
 							<Tooltip 
 								content="Permanently delete all log entries before the selected date and time."
 								position="right"
 							/>
-						</label>
-						{ purgeType === 'before' && (
-							<div className="debug-master-purge-inputs">
-								<input
-									type="datetime-local"
-									className="debug-master-input debug-master-datetime-input"
-									value={ beforeDate }
-									onChange={ ( e ) => setBeforeDate( e.target.value ) }
-								/>
-							</div>
-						) }
+						</div>
+						<div className="debug-master-toggle-wrapper debug-master-toggle-wrapper-column">
+							<Toggle
+								checked={ purgeType === 'before' }
+								onChange={ () => setPurgeType( purgeType === 'before' ? 'keep' : 'before' ) }
+							/>
+							{ purgeType === 'before' && (
+								<div className="debug-master-purge-inputs">
+									<input
+										type="datetime-local"
+										className="debug-master-input debug-master-datetime-input"
+										value={ beforeDate }
+										onChange={ ( e ) => setBeforeDate( e.target.value ) }
+									/>
+								</div>
+							) }
+						</div>
 					</div>
 				</div>
 

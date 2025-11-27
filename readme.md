@@ -13,8 +13,7 @@
 - Toggle debug logging with one click
 - JavaScript error logging support
 - Secure log file location
-- Hot reload support for development
-
+x
 ## Installation
 
 1. Upload the plugin files to the `/wp-content/plugins/debug-master` directory, or install it via the WordPress plugin screen.

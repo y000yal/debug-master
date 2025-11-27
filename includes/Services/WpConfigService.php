@@ -148,24 +148,24 @@ class WpConfigService {
 			$formatted_value = "'" . addslashes( (string) $value ) . "'";
 		}
 
-		$new_constant = "define( '" . $constant_name . "', " . $formatted_value . " );";
+		$new_constant = "define( '" . $constant_name . "', " . $formatted_value . ' );';
 
 		$escaped_name = preg_quote( $constant_name, '/' );
-		
+
 		// First, remove any existing definitions of this constant (handles various formats).
 		// This pattern matches define statements with the constant name, handling:
-		// - Single or double quotes around constant name
-		// - Various value formats (strings with escaped quotes, booleans, numbers)
-		// - Multiline defines
-		// - Optional whitespace
+		// - Single or double quotes around constant name.
+		// - Various value formats (strings with escaped quotes, booleans, numbers).
+		// - Multiline defines.
+		// - Optional whitespace.
 		$remove_patterns = array(
-			// Pattern for single-line defines with single-quoted strings
+			// Pattern for single-line defines with single-quoted strings.
 			"/define\s*\(\s*['\"]" . $escaped_name . "['\"]\s*,\s*'[^']*'\s*\)\s*;/i",
-			// Pattern for single-line defines with double-quoted strings
+			// Pattern for single-line defines with double-quoted strings.
 			"/define\s*\(\s*['\"]" . $escaped_name . "['\"]\s*,\s*\"[^\"]*\"\s*\)\s*;/i",
-			// Pattern for booleans and numbers
+			// Pattern for booleans and numbers.
 			"/define\s*\(\s*['\"]" . $escaped_name . "['\"]\s*,\s*(?:true|false|\d+)\s*\)\s*;/i",
-			// More aggressive pattern for multiline or complex cases
+			// More aggressive pattern for multiline or complex cases.
 			"/define\s*\(\s*['\"]" . $escaped_name . "['\"]\s*,[^;]*?\)\s*;/is",
 		);
 
@@ -286,13 +286,13 @@ class WpConfigService {
 
 		// Remove patterns for the constant definition.
 		$remove_patterns = array(
-			// Pattern for single-line defines with single-quoted strings
+			// Pattern for single-line defines with single-quoted strings.
 			"/define\s*\(\s*['\"]" . $escaped_name . "['\"]\s*,\s*'[^']*'\s*\)\s*;/i",
-			// Pattern for single-line defines with double-quoted strings
+			// Pattern for single-line defines with double-quoted strings.
 			"/define\s*\(\s*['\"]" . $escaped_name . "['\"]\s*,\s*\"[^\"]*\"\s*\)\s*;/i",
-			// Pattern for booleans and numbers
+			// Pattern for booleans and numbers.
 			"/define\s*\(\s*['\"]" . $escaped_name . "['\"]\s*,\s*(?:true|false|\d+)\s*\)\s*;/i",
-			// More aggressive pattern for multiline or complex cases
+			// More aggressive pattern for multiline or complex cases.
 			"/define\s*\(\s*['\"]" . $escaped_name . "['\"]\s*,[^;]*?\)\s*;/is",
 		);
 
@@ -315,4 +315,3 @@ class WpConfigService {
 		return true; // Constant didn't exist, which is fine.
 	}
 }
-

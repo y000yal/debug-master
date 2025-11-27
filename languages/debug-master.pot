@@ -1,0 +1,147 @@
+# Copyright (C) 2025 Y0000el
+# This file is distributed under the GPLv2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Debug Master 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/debug-master\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2025-11-27T15:57:43+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: debug-master\n"
+
+#. Plugin Name of the plugin
+#: debug-master.php
+#: includes/Settings.php:36
+#: includes/Settings.php:37
+msgid "Debug Master"
+msgstr ""
+
+#. Plugin URI of the plugin
+#: debug-master.php
+msgid "https://debugmaster.com/"
+msgstr ""
+
+#. Description of the plugin
+#: debug-master.php
+msgid "Modern debug log management for WordPress with React interface, log purging, and advanced filtering."
+msgstr ""
+
+#. Author of the plugin
+#: debug-master.php
+msgid "Y0000el"
+msgstr ""
+
+#. Author URI of the plugin
+#: debug-master.php
+msgid "https://yoyallimbu.com.np"
+msgstr ""
+
+#: includes/Controllers/DebugLogController.php:124
+msgid "PHP log file cleared successfully."
+msgstr ""
+
+#: includes/Controllers/DebugLogController.php:136
+msgid "JavaScript log file cleared successfully."
+msgstr ""
+
+#: includes/Controllers/DebugLogController.php:154
+msgid "Failed to clear log file(s)."
+msgstr ""
+
+#: includes/Controllers/DebugLogController.php:173
+msgid "JavaScript error logging is disabled."
+msgstr ""
+
+#: includes/Controllers/DebugLogController.php:185
+msgid "Invalid nonce."
+msgstr ""
+
+#: includes/Controllers/DebugLogController.php:198
+msgid "Missing required fields."
+msgstr ""
+
+#: includes/Controllers/DebugLogController.php:219
+msgid "JavaScript log file path not configured."
+msgstr ""
+
+#: includes/Controllers/DebugLogController.php:246
+msgid "Failed to write to JavaScript log file."
+msgstr ""
+
+#: includes/Controllers/DebugLogController.php:255
+msgid "JavaScript error logged successfully."
+msgstr ""
+
+#: includes/Controllers/DebugLogController.php:308
+msgid "No logs found to export."
+msgstr ""
+
+#: includes/Controllers/LogPurgeController.php:51
+msgid "Date parameter is required."
+msgstr ""
+
+#: includes/Controllers/LogPurgeController.php:67
+#: includes/Controllers/LogPurgeController.php:125
+msgid "PHP logs purged successfully."
+msgstr ""
+
+#: includes/Controllers/LogPurgeController.php:79
+#: includes/Controllers/LogPurgeController.php:137
+msgid "JavaScript logs purged successfully."
+msgstr ""
+
+#: includes/Controllers/LogPurgeController.php:97
+#: includes/Controllers/LogPurgeController.php:155
+msgid "Failed to purge logs."
+msgstr ""
+
+#: includes/Controllers/SettingsController.php:65
+msgid "Log file path not configured."
+msgstr ""
+
+#: includes/Controllers/SettingsController.php:84
+msgid "Failed to enable debug logging."
+msgstr ""
+
+#: includes/Controllers/SettingsController.php:101
+msgid "Debug logging enabled."
+msgstr ""
+
+#: includes/Controllers/SettingsController.php:102
+msgid "Debug logging disabled."
+msgstr ""
+
+#: includes/Controllers/SettingsController.php:151
+msgid "Settings updated successfully."
+msgstr ""
+
+#: includes/Middlewares/PermissionMiddleware.php:34
+msgid "You are not allowed to perform this action."
+msgstr ""
+
+#: includes/Services/LogPurgeService.php:43
+msgid "Log file not found or not readable."
+msgstr ""
+
+#: includes/Services/LogPurgeService.php:53
+msgid "Invalid date format."
+msgstr ""
+
+#. translators: %d is the number of entries deleted.
+#: includes/Services/LogPurgeService.php:84
+#, php-format
+msgid "Deleted %d log entries."
+msgstr ""
+
+#: includes/Services/LogPurgeService.php:93
+msgid "Failed to write log file."
+msgstr ""
+
+#: includes/Services/LogPurgeService.php:110
+msgid "Invalid period type."
+msgstr ""

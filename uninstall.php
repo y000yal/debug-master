@@ -29,4 +29,3 @@ foreach ( $options_to_delete as $option ) {
 
 // Delete transients.
 delete_transient( 'debugm_activation_redirect' );
-

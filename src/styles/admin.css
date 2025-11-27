@@ -5,39 +5,39 @@
 	--dm-primary: #bcbcbc;
 	--dm-primary-dark: #a0a0a0;
 	--dm-primary-light: #d8d8d8;
-	
+
 	/* Secondary Colors */
 	--dm-secondary: #6366f1;
 	--dm-secondary-dark: #4f46e5;
 	--dm-secondary-light: #8b5cf6;
-	
+
 	/* Accent Colors */
 	--dm-accent: #bcbcbc;
-	
+
 	/* Status Colors */
 	--dm-success: #46b450;
 	--dm-warning: #ffb900;
 	--dm-danger: #db2e2e;
 	--dm-danger-dark: #c02525;
-	
+
 	/* Text Colors */
 	--dm-text-primary: #1e1e1e;
 	--dm-text-secondary: #4b5563;
 	--dm-text-muted: #6b7280;
 	--dm-text-light: #666;
 	--dm-text-white: #fff;
-	
+
 	/* Background Colors */
 	--dm-bg-primary: #fff;
 	--dm-bg-secondary: #f5f5f5;
 	--dm-bg-tertiary: #f9fafb;
 	--dm-bg-hover: #f3f4f6;
-	
+
 	/* Border Colors */
 	--dm-border: #e5e7eb;
 	--dm-border-light: #eee;
 	--dm-border-dark: #ddd;
-	
+
 	/* Shadow */
 	--dm-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
 	--dm-shadow-md: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -453,6 +453,8 @@
 	align-items: center;
 	gap: 8px;
 	margin-bottom: 8px;
+	flex: 0 0 auto;
+	min-width: 200px;
 }
 
 .debug-master-setting-label-wrapper > label {
@@ -473,8 +475,8 @@
 .debug-master-setting-row {
 	display: flex;
 	align-items: center;
-	justify-content: space-between;
-	gap: 15px;
+	justify-content: flex-start;
+	gap: 20px;
 }
 
 .debug-master-setting-item code {
@@ -537,6 +539,16 @@
 	align-items: center;
 	gap: 10px;
 	position: relative;
+}
+
+.debug-master-toggle-wrapper.debug-master-toggle-wrapper-column {
+	flex-direction: column;
+	align-items: flex-start;
+}
+
+.debug-master-toggle-wrapper.debug-master-toggle-wrapper-column .debug-master-purge-inputs {
+	margin-top: 8px;
+	width: 100%;
 }
 
 .debug-master-toggle-loader {
@@ -642,8 +654,8 @@
 }
 
 .debug-master-toggle input:checked + .toggle-slider {
-	background-color: var(--dm-primary);
-	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 0 2px rgba(188, 188, 188, 0.15);
+	background-color: #22d172;
+	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 0 2px rgba(34, 209, 114, 0.15);
 }
 
 .debug-master-toggle input:checked + .toggle-slider:before {
@@ -708,6 +720,21 @@
 	margin-left: 28px;
 	align-items: center;
 	margin-top: 8px;
+}
+
+.debug-master-radio-control-wrapper {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 8px;
+}
+
+.debug-master-radio-control-wrapper .debug-master-radio-label {
+	margin: 0;
+}
+
+.debug-master-radio-control-wrapper .debug-master-purge-inputs {
+	margin: 0;
 }
 
 .debug-master-purge-confirm-content {
@@ -1232,19 +1259,19 @@
 	.debug-master-system-info-mosaic {
 		grid-template-columns: repeat(6, 1fr);
 	}
-	
+
 	.debug-master-mosaic-card {
 		grid-column: span 3;
 	}
-	
+
 	.debug-master-card-large {
 		grid-column: span 6;
 	}
-	
+
 	.debug-master-stat-grid {
 		grid-template-columns: 1fr;
 	}
-	
+
 	.debug-master-stat-item.debug-master-stat-fullwidth {
 		grid-column: span 1;
 	}
@@ -1744,4 +1771,3 @@
 		grid-column: span 2;
 	}
 }
-
