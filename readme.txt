@@ -1,6 +1,6 @@
 === LogMate – Error Log Viewer, Debug Logger & PHP/JS Log Manager ===
 Contributors: y0000el
-Tags: debug log, export logs, errors, php log, js log
+Tags: debug, errors, log, logging, export
 Requires at least: 5.0
 Tested up to: 7.0
 Requires PHP: 7.4
