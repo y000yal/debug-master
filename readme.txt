@@ -1,18 +1,18 @@
-=== LogMate ===
+=== LogMate – Error Log Viewer, Debug Logger & PHP/JS Log Manager ===
 Contributors: y0000el
-Tags: debug, errors, developer, logging, export
+Tags: debug log, export logs, errors, php log, js log
 Requires at least: 5.0
-Tested up to: 6.9
+Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Modern log management and export for WordPress with purging, filtering, and export. by BruteFort
+View, filter, purge, and export PHP and JavaScript debug logs from a modern WordPress admin interface.
 
 == Description ==
 
-LogMate provides a modern interface for managing and exporting WordPress error and PHP/JS logs. Monitor, filter, purge, and export your logs efficiently.
+LogMate provides a modern interface for managing and exporting WordPress PHP and JavaScript debug logs. Monitor, filter, purge, and export your logs efficiently.
 
 = Key Features =
 
@@ -42,11 +42,14 @@ It should work with most managed hosts. If you encounter issues, please report t
 
 == Changelog ==
 
+= 1.1.0 =
+* Enhance - Custom Refresh Interval
+* Fix - Enable Log notice.
+
 = 1.0.0 =
 * Initial release
 
 == Upgrade Notice ==
 
 = 1.0.0 =
-Initial release of LogMate.
-
+Initial release of LogMate – Error Log Viewer, Debug Logger & PHP/JS Log Manager.

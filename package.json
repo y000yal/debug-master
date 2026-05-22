@@ -1,7 +1,9 @@
 {
   "name": "logmate",
-  "title": "LogMate",
-  "description": "Modern log management and export for WordPress with purging, filtering, and export.",
+  "private": true,
+  "packageManager": "pnpm@9.15.9",
+  "title": "LogMate – Error Log Viewer, Debug Logger & PHP/JS Log Manager",
+  "description": "View, filter, purge, and export PHP and JavaScript debug logs from a modern WordPress admin interface.",
   "author": "y0000el",
   "version": "1.0.0",
   "scripts": {
@@ -11,7 +13,7 @@
     "start": "cross-env NODE_ENV=development webpack serve --mode development",
     "phpcs": "composer exec phpcs -- --standard=phpcs.xml",
     "phpcs:fix": "composer exec phpcbf -- --standard=phpcs.xml",
-    "lint": "npm run phpcs",
+    "lint": "pnpm run phpcs",
     "quality": "grunt quality",
     "precommit": "grunt precommit",
     "release": "grunt release"

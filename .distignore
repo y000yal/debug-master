@@ -19,7 +19,7 @@ webpack.config.js
 *.config.js
 *.config.ts
 package.json
-package-lock.json
+pnpm-lock.yaml
 tsconfig.json
 tailwind.config.js
 postcss.config.js

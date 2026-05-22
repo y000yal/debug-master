@@ -21,7 +21,7 @@ class Settings {
 	 */
 	public function __construct() {
 		add_action( 'admin_menu', array( $this, 'register_menu' ) );
-		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ), 100 );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_public_assets' ) );
 		add_action( 'admin_init', array( $this, 'redirect_after_activation' ) );
 		register_deactivation_hook( LOGMATE_PLUGIN_FILE, array( $this, 'on_deactivation' ) );
@@ -102,7 +102,7 @@ class Settings {
 		}
 
 		// Check if webpack dev server is running (hot reload mode).
-		// Set LOGMATE_HOT_RELOAD constant to true in wp-config.php when running 'npm run hot'.
+		// Set LOGMATE_HOT_RELOAD constant to true in wp-config.php when running 'pnpm run hot'.
 		$is_hot = defined( 'LOGMATE_HOT_RELOAD' ) && LOGMATE_HOT_RELOAD && defined( 'WP_DEBUG' ) && WP_DEBUG;
 
 		if ( $is_hot ) {
@@ -130,7 +130,7 @@ class Settings {
 			wp_enqueue_style(
 				'logmate-admin',
 				logmate_get_instance()->plugin_url() . '/assets/css/admin.css',
-				array(),
+				array( 'forms' ),
 				LOGMATE_VERSION
 			);
 		}
@@ -342,6 +342,7 @@ class Settings {
 		$default_options = array(
 			'debugm_log_status'              => 'disabled',
 			'debugm_autorefresh'             => 'enabled',
+			'debugm_autorefresh_interval'    => 10,
 			'debugm_js_error_logging'        => 'enabled',
 			'debugm_modify_script_debug'     => 'enabled',
 			'debugm_process_non_utc_timezones' => 'enabled',

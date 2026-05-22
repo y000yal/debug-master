@@ -37,6 +37,8 @@
 	--dm-border: #e5e7eb;
 	--dm-border-light: #eee;
 	--dm-border-dark: #ddd;
+	--dm-input-border: #e8ecf0;
+	--dm-input-radius: 8px;
 
 	/* Shadow */
 	--dm-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -57,7 +59,7 @@
 
 .logmate-menu-container {
 	position: fixed;
-	bottom: 20px;
+	bottom: 50px;
 	right: 20px;
 	z-index: 99999;
 }
@@ -181,6 +183,121 @@
 	padding: 20px;
 }
 
+.logmate-screen-toolbar {
+	margin-bottom: 16px;
+}
+
+.logmate-back-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	padding: 6px 10px 6px 8px;
+	border: 1px solid var(--dm-input-border);
+	border-radius: var(--dm-input-radius);
+	background: var(--dm-bg-primary);
+	color: var(--dm-text-secondary);
+	font-size: 13px;
+	font-weight: 500;
+	line-height: 1;
+	cursor: pointer;
+	transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+}
+
+.logmate-back-btn:hover {
+	border-color: var(--dm-border);
+	background: var(--dm-bg-tertiary);
+	color: var(--dm-text-primary);
+}
+
+.logmate-back-btn:focus-visible {
+	outline: none;
+	border-color: #d1d5db;
+	box-shadow: 0 0 0 2px rgba(17, 24, 39, 0.04);
+}
+
+.logmate-back-btn svg {
+	flex-shrink: 0;
+}
+
+.logmate-disabled-notice {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	margin-bottom: 16px;
+	padding: 10px 14px;
+	background: var(--dm-bg-tertiary);
+	border: 1px solid var(--dm-border);
+	border-radius: 6px;
+}
+
+.logmate-disabled-notice-text {
+	flex: 1;
+	min-width: 0;
+	margin: 0;
+	color: var(--dm-text-secondary);
+	font-size: 13px;
+	line-height: 1.45;
+}
+
+.logmate-disabled-notice-text a {
+	color: var(--dm-text-primary);
+	font-weight: 500;
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+
+.logmate-disabled-notice-text a:hover {
+	color: var(--dm-secondary-dark);
+}
+
+.logmate-disabled-notice-action {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-shrink: 0;
+}
+
+.logmate-disabled-notice-action-label {
+	font-size: 12px;
+	font-weight: 500;
+	color: var(--dm-text-muted);
+	white-space: nowrap;
+}
+
+.logmate-disabled-notice-toggle {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 20px;
+	flex-shrink: 0;
+	overflow: hidden;
+}
+
+.logmate-disabled-notice-spinner {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(255, 255, 255, 0.92);
+	border-radius: 20px;
+	pointer-events: none;
+}
+
+.logmate-disabled-notice-spinner .spinner {
+	width: 14px;
+	height: 14px;
+	border: 2px solid var(--dm-border-dark);
+	border-top-color: var(--dm-primary);
+	border-radius: 50%;
+	animation: spin 1s linear infinite;
+	display: block;
+	box-sizing: border-box;
+}
+
 .logmate-meta-bar {
 	display: flex;
 	gap: 20px;
@@ -218,9 +335,6 @@
 }
 
 .logmate-search {
-	padding: 8px 12px;
-	border: 1px solid #ddd;
-	border-radius: 4px;
 	flex: 1;
 	max-width: 400px;
 }
@@ -429,6 +543,68 @@
 	border-bottom: none;
 }
 
+/* Settings skeleton — mirrors real label-wrapper + control layout */
+.logmate-settings-skeleton .logmate-setting-item {
+	display: block;
+	margin-bottom: 20px;
+	padding: 0;
+}
+
+.logmate-settings-skeleton .logmate-setting-item:last-child {
+	margin-bottom: 0;
+}
+
+.logmate-settings-skeleton .logmate-setting-label-wrapper {
+	margin-bottom: 0;
+	min-width: 0;
+}
+
+.logmate-settings-skeleton .logmate-setting-row {
+	justify-content: flex-start;
+	align-items: center;
+	gap: 20px;
+}
+
+.logmate-settings-skeleton .logmate-skeleton-control {
+	display: inline-flex;
+	align-items: center;
+	flex-shrink: 0;
+}
+
+.logmate-settings-skeleton .logmate-skeleton-purge-action {
+	margin-top: 4px;
+}
+
+.logmate-skeleton-block {
+	display: inline-block;
+	flex-shrink: 0;
+	background: linear-gradient(
+		90deg,
+		#e8e8e8 0%,
+		#f0f0f0 20%,
+		#e8e8e8 40%,
+		#e8e8e8 100%
+	);
+	background-size: 200% 100%;
+	border-radius: 4px;
+	animation: skeleton-shimmer 1.5s ease-in-out infinite;
+	vertical-align: middle;
+}
+
+.logmate-skeleton-block--badge {
+	border-radius: 4px;
+}
+
+.logmate-skeleton-block--toggle {
+	border-radius: 20px;
+}
+
+.logmate-skeleton-block--input,
+.logmate-skeleton-block--select,
+.logmate-skeleton-block--button {
+	border-radius: var(--dm-input-radius);
+}
+
 .logmate-settings-section h2 {
 	margin: 0 0 20px 0;
 	font-size: 20px;
@@ -477,6 +653,57 @@
 	align-items: center;
 	justify-content: flex-start;
 	gap: 20px;
+}
+
+.logmate-setting-row-nested {
+	margin-top: 12px;
+	padding-top: 12px;
+	padding-left: 14px;
+	border-left: 3px solid var(--dm-border);
+}
+
+.logmate-setting-row-nested .logmate-setting-label-wrapper {
+	min-width: 0;
+	margin-bottom: 0;
+}
+
+.logmate-interval-control {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	flex-shrink: 0;
+}
+
+.logmate-interval-spinner {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.logmate-interval-spinner .logmate-spinner {
+	padding: 0;
+}
+
+.logmate-interval-spinner .spinner {
+	width: 16px;
+	height: 16px;
+}
+
+#logmate-admin-app .logmate-app .logmate-interval-input {
+	width: 68px;
+	min-height: 32px;
+	text-align: center;
+}
+
+#logmate-admin-app .logmate-app .logmate-interval-input::-webkit-outer-spin-button,
+#logmate-admin-app .logmate-app .logmate-interval-input::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+#logmate-admin-app .logmate-app .logmate-interval-input[type='number'] {
+	-moz-appearance: textfield;
+	appearance: textfield;
 }
 
 .logmate-setting-item code {
@@ -608,12 +835,16 @@
 	cursor: pointer;
 }
 
-.logmate-toggle input {
+#logmate-admin-app .logmate-app .logmate-toggle input[type='checkbox'] {
 	opacity: 0 !important;
 	width: 0 !important;
 	height: 0 !important;
 	position: absolute !important;
 	appearance: none !important;
+	margin: 0 !important;
+	min-height: 0 !important;
+	border: none !important;
+	box-shadow: none !important;
 	-webkit-appearance: none !important;
 	-moz-appearance: none !important;
 	visibility: hidden !important;
@@ -846,30 +1077,77 @@
 	position: relative;
 }
 
-.logmate-input,
-.logmate-select {
-	padding: 8px 12px;
-	border: 1px solid var(--dm-border-dark);
-	border-radius: 6px;
+/* Form controls — scoped to beat wp-admin forms.css (input[type], select, min-height: 40px, etc.) */
+#logmate-admin-app .logmate-app input.logmate-input[type='text'],
+#logmate-admin-app .logmate-app input.logmate-input[type='number'],
+#logmate-admin-app .logmate-app input.logmate-input[type='search'],
+#logmate-admin-app .logmate-app input.logmate-input[type='datetime-local'],
+#logmate-admin-app .logmate-app input.logmate-search[type='text'],
+#logmate-admin-app .logmate-app select.logmate-select {
+	margin: 0;
+	padding: 7px 11px;
+	min-height: 32px;
+	line-height: 1.4;
+	border: 1px solid var(--dm-input-border);
+	border-radius: var(--dm-input-radius);
 	font-size: 13px;
 	color: var(--dm-text-primary);
-	background: var(--dm-bg-primary);
-	transition: all 0.2s;
+	background-color: var(--dm-bg-primary);
+	box-shadow: none;
+	transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
 }
 
-.logmate-input:focus,
-.logmate-select:focus {
+#logmate-admin-app .logmate-app input.logmate-input[type='text']:hover:not(:disabled):not(:read-only),
+#logmate-admin-app .logmate-app input.logmate-input[type='number']:hover:not(:disabled):not(:read-only),
+#logmate-admin-app .logmate-app input.logmate-input[type='search']:hover:not(:disabled):not(:read-only),
+#logmate-admin-app .logmate-app input.logmate-input[type='datetime-local']:hover:not(:disabled):not(:read-only),
+#logmate-admin-app .logmate-app input.logmate-search[type='text']:hover:not(:disabled):not(:read-only),
+#logmate-admin-app .logmate-app select.logmate-select:hover:not(:disabled) {
+	border-color: var(--dm-border);
+	background-color: var(--dm-bg-primary);
+}
+
+#logmate-admin-app .logmate-app input.logmate-input[type='text']:focus,
+#logmate-admin-app .logmate-app input.logmate-input[type='number']:focus,
+#logmate-admin-app .logmate-app input.logmate-input[type='search']:focus,
+#logmate-admin-app .logmate-app input.logmate-input[type='datetime-local']:focus,
+#logmate-admin-app .logmate-app input.logmate-search[type='text']:focus,
+#logmate-admin-app .logmate-app select.logmate-select:focus {
 	outline: none;
-	border-color: var(--dm-primary);
-	box-shadow: 0 0 0 3px rgba(188, 188, 188, 0.1);
+	border-color: #d1d5db;
+	box-shadow: 0 0 0 2px rgba(17, 24, 39, 0.04);
 }
 
-.logmate-datetime-input {
+#logmate-admin-app .logmate-app input.logmate-input[type='text']:disabled,
+#logmate-admin-app .logmate-app input.logmate-input[type='number']:disabled,
+#logmate-admin-app .logmate-app input.logmate-input[type='search']:disabled,
+#logmate-admin-app .logmate-app input.logmate-input[type='datetime-local']:disabled,
+#logmate-admin-app .logmate-app input.logmate-search[type='text']:disabled,
+#logmate-admin-app .logmate-app select.logmate-select:disabled {
+	background-color: var(--dm-bg-tertiary);
+	border-color: var(--dm-border-light);
+	color: var(--dm-text-muted);
+	cursor: not-allowed;
+	opacity: 0.9;
+}
+
+#logmate-admin-app .logmate-app input.logmate-input::placeholder,
+#logmate-admin-app .logmate-app input.logmate-search::placeholder {
+	color: var(--dm-text-muted);
+}
+
+#logmate-admin-app .logmate-app .logmate-datetime-input {
 	min-width: 200px;
 }
 
-.logmate-select {
+#logmate-admin-app .logmate-app select.logmate-select {
 	cursor: pointer;
+	appearance: none;
+	line-height: 1.4;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 256 256' fill='%236b7280'%3E%3Cpath d='M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 10px center;
+	padding-right: 30px;
 }
 
 .logmate-spinner {
@@ -1082,18 +1360,8 @@
 	color: var(--dm-text-secondary);
 }
 
-.logmate-datetime-input {
-	padding: 8px 12px;
-	border: 1px solid var(--dm-border-dark);
-	border-radius: 4px;
-	font-size: 14px;
+.logmate-date-input-group .logmate-datetime-input {
 	width: 100%;
-}
-
-.logmate-datetime-input:focus {
-	outline: none;
-	border-color: var(--dm-primary);
-	box-shadow: 0 0 0 2px rgba(188, 188, 188, 0.1);
 }
 
 .logmate-modal-footer {
@@ -1254,6 +1522,31 @@
 	font-weight: 500;
 }
 
+.logmate-system-info-skeleton .logmate-stat-item .logmate-skeleton + .logmate-skeleton {
+	margin-top: 6px;
+}
+
+.logmate-plugin-item-skeleton {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 12px;
+	padding: 12px;
+	background: var(--dm-bg-tertiary);
+	border-radius: 4px;
+	border: 1px solid var(--dm-border);
+	pointer-events: none;
+}
+
+.logmate-plugin-item-skeleton .logmate-skeleton {
+	flex: 1;
+	min-width: 0;
+}
+
+.logmate-plugin-item-skeleton .logmate-skeleton:last-child {
+	flex: 0 0 auto;
+}
+
 /* Responsive adjustments */
 @media (max-width: 1200px) {
 	.logmate-system-info-mosaic {
@@ -1348,6 +1641,14 @@
 
 	.logmate-screen {
 		padding: 10px;
+	}
+
+	.logmate-disabled-notice {
+		flex-wrap: wrap;
+	}
+
+	.logmate-disabled-notice-action {
+		margin-left: auto;
 	}
 
 	/* Floating Menu */
@@ -1458,13 +1759,36 @@
 		padding: 15px;
 	}
 
+	.logmate-settings-skeleton .logmate-setting-item {
+		display: block;
+		padding: 0;
+		gap: 0;
+	}
+
+	.logmate-settings-skeleton .logmate-setting-row {
+		flex-wrap: wrap;
+	}
+
+	.logmate-settings-skeleton .logmate-toggle-wrapper {
+		width: auto;
+		justify-content: flex-start;
+	}
+
 	.logmate-setting-label-wrapper {
 		width: 100%;
+	}
+
+	.logmate-settings-skeleton .logmate-setting-label-wrapper {
+		width: auto;
 	}
 
 	.logmate-setting-controls {
 		width: 100%;
 		justify-content: space-between;
+	}
+
+	.logmate-setting-row-nested .logmate-interval-control {
+		width: auto;
 	}
 
 	.logmate-toggle-wrapper {
@@ -1609,10 +1933,14 @@
 	}
 
 	/* Inputs and Selects */
-	.logmate-input,
-	.logmate-select {
+	#logmate-admin-app .logmate-app input.logmate-input[type='text'],
+	#logmate-admin-app .logmate-app input.logmate-input[type='number'],
+	#logmate-admin-app .logmate-app input.logmate-input[type='search'],
+	#logmate-admin-app .logmate-app input.logmate-input[type='datetime-local'],
+	#logmate-admin-app .logmate-app input.logmate-search[type='text'],
+	#logmate-admin-app .logmate-app select.logmate-select {
 		font-size: 14px;
-		padding: 10px 12px;
+		padding: 8px 11px;
 		width: 100%;
 	}
 

@@ -20,6 +20,21 @@ use WP_REST_Response;
 class SettingsController extends BaseController {
 
 	/**
+	 * Default auto-refresh interval in seconds.
+	 */
+	private const AUTOREFRESH_INTERVAL_DEFAULT = 10;
+
+	/**
+	 * Minimum auto-refresh interval in seconds.
+	 */
+	private const AUTOREFRESH_INTERVAL_MIN = 3;
+
+	/**
+	 * Maximum auto-refresh interval in seconds.
+	 */
+	private const AUTOREFRESH_INTERVAL_MAX = 300;
+
+	/**
 	 * Get current settings.
 	 *
 	 * @param WP_Rest_Request $request The REST request object.
@@ -29,6 +44,7 @@ class SettingsController extends BaseController {
 		$settings = array(
 			'log_status'                  => get_option( 'debugm_log_status', 'disabled' ),
 			'autorefresh'                 => get_option( 'debugm_autorefresh', 'enabled' ),
+			'autorefresh_interval'        => (int) get_option( 'debugm_autorefresh_interval', self::AUTOREFRESH_INTERVAL_DEFAULT ),
 			'js_error_logging'            => get_option( 'debugm_js_error_logging', 'enabled' ),
 			'modify_script_debug'         => get_option( 'debugm_modify_script_debug', 'enabled' ),
 			'process_non_utc_timezones'   => get_option( 'debugm_process_non_utc_timezones', 'enabled' ),
@@ -122,7 +138,13 @@ class SettingsController extends BaseController {
 		);
 
 		$wp_config_service = new WpConfigService();
-		$log_status = get_option( 'debugm_log_status', 'disabled' );
+		$log_status        = get_option( 'debugm_log_status', 'disabled' );
+
+		if ( isset( $params['autorefresh_interval'] ) ) {
+			$interval = absint( $params['autorefresh_interval'] );
+			$interval = max( self::AUTOREFRESH_INTERVAL_MIN, min( self::AUTOREFRESH_INTERVAL_MAX, $interval ) );
+			update_option( 'debugm_autorefresh_interval', $interval, false );
+		}
 
 		foreach ( $allowed_settings as $setting ) {
 			if ( isset( $params[ $setting ] ) ) {

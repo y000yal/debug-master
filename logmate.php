@@ -1,10 +1,10 @@
 <?php // phpcs:ignore
 
 /**
- * Plugin Name: LogMate
+ * Plugin Name: LogMate – Error Log Viewer, Debug Logger & PHP/JS Log Manager
  * Plugin URI: https://brutefort.com/#/products/logmate
- * Description: Modern log management and export for WordPress with purging, filtering, and export. by BruteFort
- * Version: 1.0.0
+ * Description: View, filter, purge, and export PHP and JavaScript debug logs from a modern WordPress admin interface.
+ * Version: 1.1.0
  * Author: Y0000el
  * Author URI: https://yoyallimbu.com.np
  * Text Domain: logmate
@@ -20,8 +20,11 @@ use LogMate\Settings;
 
 defined( 'ABSPATH' ) || exit;
 
-// Autoload composer.
-if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
+// Include helper functions (needed before bootstrap checks).
+require_once plugin_dir_path( __FILE__ ) . 'includes/helpers.php';
+
+// Autoload composer when dependencies are installed.
+if ( logmate_is_composer_installed() ) {
 	require_once __DIR__ . '/vendor/autoload.php';
 }
 
@@ -37,7 +40,7 @@ final class LogMate {
 	 *
 	 * @var string
 	 */
-	public string $version = '1.0.0';
+	public string $version = '1.1.0';
 
 	/**
 	 * Singleton instance.
@@ -119,6 +122,10 @@ final class LogMate {
 	 * @return void
 	 */
 	private function includes(): void {
+		if ( ! logmate_is_composer_installed() ) {
+			return;
+		}
+
 		// Load admin routes.
 		new Routes();
 
@@ -210,8 +217,9 @@ final class LogMate {
 	}
 }
 
-// Include helper functions.
-require_once plugin_dir_path( __FILE__ ) . 'includes/helpers.php';
-
-// Set global.
-$GLOBALS['logmate'] = logmate_get_instance();
+if ( ! logmate_is_composer_installed() ) {
+	add_action( 'admin_notices', 'logmate_composer_missing_admin_notice' );
+} else {
+	// Set global.
+	$GLOBALS['logmate'] = logmate_get_instance();
+}

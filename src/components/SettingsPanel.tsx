@@ -8,12 +8,22 @@ import { StatusIndicator } from './StatusIndicator';
 import { Toggle } from './Toggle';
 import { Spinner } from './Spinner';
 import { Tooltip } from './Tooltip';
+import { useToggleLogging } from '../hooks/useToggleLogging';
+import { BackToLogsButton } from './BackToLogsButton';
+import { SettingsSkeleton } from './SettingsSkeleton';
+import {
+	DEFAULT_AUTOREFRESH_INTERVAL_SECONDS,
+	MAX_AUTOREFRESH_INTERVAL_SECONDS,
+	MIN_AUTOREFRESH_INTERVAL_SECONDS,
+	normalizeAutorefreshInterval,
+} from '../constants/settings';
 
 export const SettingsPanel: React.FC = () => {
 	const queryClient = useQueryClient();
 	const [ updatingSetting, setUpdatingSetting ] = React.useState< string | null >( null );
+	const [ intervalInput, setIntervalInput ] = React.useState( String( DEFAULT_AUTOREFRESH_INTERVAL_SECONDS ) );
 
-	const { data: settings, isLoading } = useQuery< { data: Settings } >( {
+	const { data: settings, isPending } = useQuery< { data: Settings } >( {
 		queryKey: [ 'settings' ],
 		queryFn: async () => {
 			const response = await api.get( '/settings' );
@@ -21,27 +31,7 @@ export const SettingsPanel: React.FC = () => {
 		},
 	} );
 
-	const toggleLoggingMutation = useMutation( {
-		mutationFn: async () => {
-			const response = await api.post( '/settings/toggle-logging' );
-			return response.data;
-		},
-		onSuccess: ( data ) => {
-			toast.success( data.message );
-			// Optimistically update cache so UI never reads undefined during refetch.
-			const cached = queryClient.getQueryData< { data: Settings } >( [ 'settings' ] );
-			if ( cached?.data ) {
-				const newStatus = cached.data.log_status === 'enabled' ? 'disabled' : 'enabled';
-				queryClient.setQueryData< { data: Settings } >( [ 'settings' ], {
-					data: { ...cached.data, log_status: newStatus },
-				} );
-			}
-			queryClient.invalidateQueries( { queryKey: [ 'settings' ] } );
-		},
-		onError: () => {
-			toast.error( 'Failed to toggle logging' );
-		},
-	} );
+	const toggleLoggingMutation = useToggleLogging();
 
 	const updateSettingsMutation = useMutation( {
 		mutationFn: async ( updatedSettings: Partial< Settings > ) => {
@@ -70,6 +60,24 @@ export const SettingsPanel: React.FC = () => {
 		},
 	} );
 
+	const handleIntervalSave = () => {
+		if ( updateSettingsMutation.isPending || toggleLoggingMutation.isPending ) {
+			return;
+		}
+
+		const parsed = parseInt( intervalInput, 10 );
+		const normalized = normalizeAutorefreshInterval( Number.isNaN( parsed ) ? undefined : parsed );
+		setIntervalInput( String( normalized ) );
+
+		const currentInterval = normalizeAutorefreshInterval( settings?.data?.autorefresh_interval );
+		if ( normalized === currentInterval ) {
+			return;
+		}
+
+		setUpdatingSetting( 'autorefresh_interval' );
+		updateSettingsMutation.mutate( { autorefresh_interval: normalized } );
+	};
+
 	const handleSettingUpdate = ( settingKey: keyof Settings, currentValue: string ) => {
 		// Prevent multiple clicks if this specific setting is already updating
 		if ( updatingSetting === settingKey || updateSettingsMutation.isPending || toggleLoggingMutation.isPending ) {
@@ -81,20 +89,29 @@ export const SettingsPanel: React.FC = () => {
 		} );
 	};
 
-	// Guard against undefined settings or settings.data (e.g. after invalidateQueries during refetch).
-	if ( isLoading || ! settings?.data ) {
-		return (
-			<div className="logmate-screen">
-				<Spinner />
-			</div>
-		);
+	const savedInterval = normalizeAutorefreshInterval( settings?.data?.autorefresh_interval );
+
+	React.useEffect( () => {
+		setIntervalInput( String( savedInterval ) );
+	}, [ savedInterval ] );
+
+	if ( isPending ) {
+		return <SettingsSkeleton />;
+	}
+
+	if ( ! settings?.data ) {
+		return null;
 	}
 
 	const currentSettings = settings.data;
 	const isLoggingEnabled = currentSettings.log_status === 'enabled';
+	const isAutorefreshEnabled = currentSettings.autorefresh === 'enabled';
 
 	return (
 		<div className="logmate-screen">
+			<div className="logmate-screen-toolbar">
+				<BackToLogsButton />
+			</div>
 			<div className="logmate-settings">
 				<div className="logmate-settings-section">
 					<div className="logmate-setting-header">
@@ -114,13 +131,13 @@ export const SettingsPanel: React.FC = () => {
 								<div className="logmate-setting-label-wrapper">
 									<label>Auto-refresh logs</label>
 									<Tooltip 
-										content="Automatically refresh logs every 10 seconds to show new entries in real-time."
+										content="Automatically refresh logs on a custom interval to show new entries in real-time."
 										position="right"
 									/>
 								</div>
 								<div className="logmate-toggle-wrapper">
 									<Toggle
-										checked={ currentSettings.autorefresh === 'enabled' }
+										checked={ isAutorefreshEnabled }
 										onChange={ () => handleSettingUpdate( 'autorefresh', currentSettings.autorefresh ) }
 										disabled={ updatingSetting === 'autorefresh' || toggleLoggingMutation.isPending }
 									/>
@@ -131,6 +148,41 @@ export const SettingsPanel: React.FC = () => {
 									) }
 								</div>
 							</div>
+							{ isAutorefreshEnabled && (
+								<div className="logmate-setting-row logmate-setting-row-nested">
+									<div className="logmate-setting-label-wrapper">
+										<label htmlFor="logmate-autorefresh-interval">Refresh interval (seconds)</label>
+										<Tooltip
+											content={ `How often to reload logs (${ MIN_AUTOREFRESH_INTERVAL_SECONDS }–${ MAX_AUTOREFRESH_INTERVAL_SECONDS } seconds). Default is ${ DEFAULT_AUTOREFRESH_INTERVAL_SECONDS } seconds.` }
+											position="right"
+										/>
+									</div>
+									<div className="logmate-interval-control">
+										<input
+											id="logmate-autorefresh-interval"
+											type="number"
+											className="logmate-input logmate-interval-input"
+											min={ MIN_AUTOREFRESH_INTERVAL_SECONDS }
+											max={ MAX_AUTOREFRESH_INTERVAL_SECONDS }
+											step={ 1 }
+											value={ intervalInput }
+											onChange={ ( event ) => setIntervalInput( event.target.value ) }
+											onBlur={ handleIntervalSave }
+											onKeyDown={ ( event ) => {
+												if ( event.key === 'Enter' ) {
+													event.currentTarget.blur();
+												}
+											} }
+											disabled={ updatingSetting === 'autorefresh_interval' || toggleLoggingMutation.isPending }
+										/>
+										{ updatingSetting === 'autorefresh_interval' && (
+											<span className="logmate-interval-spinner" aria-hidden="true">
+												<Spinner />
+											</span>
+										) }
+									</div>
+								</div>
+							) }
 						</div>
 						<div className="logmate-setting-item">
 							<div className="logmate-setting-row">

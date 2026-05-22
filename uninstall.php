@@ -14,6 +14,7 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 $options_to_delete = array(
 	'debugm_log_status',
 	'debugm_autorefresh',
+	'debugm_autorefresh_interval',
 	'debugm_js_error_logging',
 	'debugm_modify_script_debug',
 	'debugm_process_non_utc_timezones',

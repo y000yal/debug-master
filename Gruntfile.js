@@ -82,7 +82,7 @@ module.exports = function (grunt) {
 								"!dist/**",
 								"!release/**",
 								"!Gruntfile.js",
-								"!package-lock.json",
+								"!pnpm-lock.yaml",
 								"!webpack.config.js",
 								"!tests/**",
 								"!composer.lock",
@@ -103,7 +103,7 @@ module.exports = function (grunt) {
 								"!.DS_Store",
 								"!Thumbs.db",
 								"!package.json",
-								"!package-lock.json",
+								"!pnpm-lock.yaml",
 								"!tsconfig.json",
 								"!tailwind.config.js",
 								"!postcss.config.js",
@@ -147,10 +147,10 @@ module.exports = function (grunt) {
 					command: "composer exec wp -- i18n make-pot . languages/logmate.pot --domain=logmate"
 				},
 				phpcs: {
-					command: "npm run phpcs"
+					command: "pnpm run phpcs"
 				},
 				phpcsFix: {
-					command: "npm run phpcs:fix"
+					command: "pnpm run phpcs:fix"
 				}
 			},
 		}

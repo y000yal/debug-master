@@ -1,6 +1,6 @@
-# LogMate
+# LogMate – Error Log Viewer, Debug Logger & PHP/JS Log Manager
 
-**Modern log management and export for WordPress with purging, filtering, and export.**
+**View, filter, purge, and export PHP and JavaScript debug logs from a modern WordPress admin interface.**
 
 ## Features
 
@@ -29,20 +29,20 @@ x
 composer install
 
 # Install Node dependencies
-npm install
+pnpm install
 
 # Run development server with hot reload
-npm run hot
+pnpm run hot
 
 # Build for production
-npm run build
+pnpm run build
 ```
 
 ### Hot Reload
 
 To enable hot reload during development:
 
-1. Run `npm run hot` in the plugin directory
+1. Run `pnpm run hot` in the plugin directory
 2. Add this to your `wp-config.php`:
    ```php
    define( 'LOGMATE_HOT_RELOAD', true );

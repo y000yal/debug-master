@@ -2,8 +2,9 @@ import React, { useEffect, useMemo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import api from '../axios/api';
 import { LogsTable } from '../components/LogsTable';
-import { LogEntry, LogsResponse, Settings } from '../types';
-import { Spinner } from '../components/Spinner';
+import { LoggingDisabledNotice } from '../components/LoggingDisabledNotice';
+import { LogsResponse, Settings } from '../types';
+import { normalizeAutorefreshInterval } from '../constants/settings';
 
 export const LogsScreen: React.FC = () => {
 	const [ logType, setLogType ] = React.useState< 'all' | 'php' | 'js' >( 'all' );
@@ -27,6 +28,11 @@ export const LogsScreen: React.FC = () => {
 	const autorefreshEnabled = useMemo( () => {
 		return settingsData?.data?.autorefresh === 'enabled';
 	}, [ settingsData?.data?.autorefresh ] );
+
+	const autorefreshIntervalMs = useMemo( () => {
+		const seconds = normalizeAutorefreshInterval( settingsData?.data?.autorefresh_interval );
+		return seconds * 1000;
+	}, [ settingsData?.data?.autorefresh_interval ] );
 	
 	const { data, isLoading, error, refetch: refetchLogs, isFetching } = useQuery< LogsResponse >( {
 		queryKey: [ 'logs', logType ],
@@ -63,10 +69,9 @@ export const LogsScreen: React.FC = () => {
 		let intervalId: NodeJS.Timeout | null = null;
 
 		if ( autorefreshEnabled ) {
-			// Set up interval to refetch logs every 10 seconds.
 			intervalId = setInterval( () => {
 				refetch();
-			}, 10000 ); // 10 seconds
+			}, autorefreshIntervalMs );
 		}
 
 		// Cleanup interval on unmount or when setting changes.
@@ -76,10 +81,13 @@ export const LogsScreen: React.FC = () => {
 			}
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ autorefreshEnabled, logStatusEnabled, refetch ] ); // Depend on autorefreshEnabled, logStatusEnabled, and refetch
+	}, [ autorefreshEnabled, autorefreshIntervalMs, logStatusEnabled, refetch ] );
 
 	return (
 		<div className="logmate-screen">
+			{ settingsData?.data && (
+				<LoggingDisabledNotice logStatus={ settingsData.data.log_status } />
+			) }
 			{ error ? (
 				<div className="logmate-error">
 					Error loading logs. Please try again.

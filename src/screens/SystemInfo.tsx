@@ -1,7 +1,8 @@
 import React from 'react';
 import {useQuery} from '@tanstack/react-query';
 import api from '../axios/api';
-import {Spinner} from '../components/Spinner';
+import { SystemInfoSkeleton } from '../components/SystemInfoSkeleton';
+import { BackToLogsButton } from '../components/BackToLogsButton';
 
 interface SystemInfo {
     php: {
@@ -47,7 +48,7 @@ interface SystemInfo {
 }
 
 export const SystemInfoScreen: React.FC = () => {
-    const {data, isLoading, error} = useQuery<{ data: SystemInfo }>({
+    const { data, isPending, error } = useQuery<{ data: SystemInfo }>( {
         queryKey: ['system-info'],
         queryFn: async () => {
             const response = await api.get('/system-info');
@@ -55,17 +56,16 @@ export const SystemInfoScreen: React.FC = () => {
         },
     });
 
-    if (isLoading) {
-        return (
-            <div className="logmate-screen">
-                <Spinner/>
-            </div>
-        );
+    if ( isPending ) {
+        return <SystemInfoSkeleton />;
     }
 
     if (error) {
         return (
             <div className="logmate-screen">
+                <div className="logmate-screen-toolbar">
+                    <BackToLogsButton />
+                </div>
                 <div className="logmate-error">
                     Error loading system information. Please try again.
                 </div>
@@ -81,6 +81,9 @@ export const SystemInfoScreen: React.FC = () => {
 
     return (
         <div className="logmate-screen">
+            <div className="logmate-screen-toolbar">
+                <BackToLogsButton />
+            </div>
             <div className="logmate-system-info-mosaic">
 
                 {/* PHP Card */}

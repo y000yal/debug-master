@@ -11,6 +11,7 @@ export interface LogEntry {
 export interface Settings {
 	log_status: string;
 	autorefresh: string;
+	autorefresh_interval: number;
 	js_error_logging: string;
 	modify_script_debug: string;
 	process_non_utc_timezones: string;

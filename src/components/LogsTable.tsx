@@ -175,7 +175,7 @@ export const LogsTable: React.FC< LogsTableProps > = ( {
 							placeholder="Search logs..."
 							value={ globalFilter ?? '' }
 							onChange={ ( e ) => setGlobalFilter( e.target.value ) }
-							className="logmate-search"
+							className="logmate-input logmate-search"
 						/>
 						<button
 							onClick={ () => setIsExportModalOpen( true ) }
