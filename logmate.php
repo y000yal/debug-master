@@ -3,7 +3,7 @@
 /**
  * Plugin Name: LogMate – Error Log Viewer, Debug Logger & PHP/JS Log Manager
  * Plugin URI: https://brutefort.com/#/products/logmate
- * Description: View, filter, purge, and export PHP and JavaScript debug logs from a modern WordPress admin interface.
+ * Description: WordPress debug log viewer — read PHP & JS logs, search errors, purge logs, and export logs from your admin dashboard.
  * Version: 1.1.0
  * Author: Y0000el
  * Author URI: https://yoyallimbu.com.np
