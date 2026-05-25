@@ -4,7 +4,7 @@ Tags: debug log, export logs, errors, php log, js log
 Requires at least: 5.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.1.0
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -41,6 +41,9 @@ It should work with most managed hosts. If you encounter issues, please report t
 
 
 == Changelog ==
+
+= 1.2.0 =
+* Enhance - Copy and show previous logs from debug.log
 
 = 1.1.0 =
 * Enhance - Custom Refresh Interval

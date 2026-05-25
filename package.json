@@ -5,7 +5,7 @@
   "title": "LogMate – Error Log Viewer, Debug Logger & PHP/JS Log Manager",
   "description": "View, filter, purge, and export PHP and JavaScript debug logs from a modern WordPress admin interface.",
   "author": "y0000el",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack",
     "dev": "cross-env NODE_ENV=development webpack --watch",

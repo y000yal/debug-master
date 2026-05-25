@@ -224,12 +224,57 @@ class WpConfigService {
 	 * @return bool
 	 */
 	public function is_absolute_path( string $path ): bool {
-		// Windows absolute path (C:\ or \\server).
-		if ( preg_match( '/^[A-Z]:\\\\/i', $path ) || preg_match( '/^\\\\/', $path ) ) {
+		$path = trim( $path );
+		if ( '' === $path ) {
+			return false;
+		}
+
+		// Windows absolute path (C:\, C:/, or \\server).
+		if ( preg_match( '/^[A-Za-z]:[\/\\\\]/', $path ) || preg_match( '/^\\\\/', $path ) ) {
 			return true;
 		}
+
 		// Unix absolute path.
 		return '/' === $path[0];
+	}
+
+	/**
+	 * Read the current WP_DEBUG_LOG path from wp-config.php before it is changed.
+	 *
+	 * @return string|null Absolute path, or null when not defined / not a file path.
+	 */
+	public function get_wp_debug_log_path_from_config(): ?string {
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_exists
+		if ( ! file_exists( $this->wp_config_path ) ) {
+			return null;
+		}
+
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_get_contents
+		$content = file_get_contents( $this->wp_config_path );
+		if ( false === $content || ! preg_match( "/define\s*\(\s*['\"]WP_DEBUG_LOG['\"]\s*,\s*([^)]+)\s*\)\s*;/i", $content, $matches ) ) {
+			return null;
+		}
+
+		$value = trim( $matches[1] );
+
+		if ( preg_match( '/^true$/i', $value ) ) {
+			return wp_normalize_path( WP_CONTENT_DIR . '/debug.log' );
+		}
+
+		if ( preg_match( '/^false$/i', $value ) ) {
+			return null;
+		}
+
+		if ( preg_match( "/^['\"]([^'\"]+)['\"]$/", $value, $path_match ) ) {
+			$path = wp_unslash( $path_match[1] );
+			return $this->is_absolute_path( $path ) ? wp_normalize_path( $path ) : wp_normalize_path( ABSPATH . ltrim( $path, '/' ) );
+		}
+
+		if ( preg_match( "/ABSPATH\s*\.\s*['\"]([^'\"]+)['\"]/i", $value, $path_match ) ) {
+			return wp_normalize_path( ABSPATH . ltrim( $path_match[1], '/' ) );
+		}
+
+		return null;
 	}
 
 	/**
