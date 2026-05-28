@@ -1,6 +1,6 @@
 # LogMate – Error Log Viewer, Debug Logger & PHP/JS Log Manager
 
-**View, filter, purge, and export PHP and JavaScript debug logs from a modern WordPress admin interface.**
+**WordPress debug log viewer** — read PHP & JS **logs**, search errors, purge **logs**, and **export logs** from your admin dashboard.
 
 ## Features
 
