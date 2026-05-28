@@ -8,6 +8,7 @@
 namespace LogMate\Controllers;
 
 use LogMate\Controllers\Controller as BaseController;
+use LogMate\Services\DebugLogMigrationService;
 use LogMate\Services\WpConfigService;
 use WP_Rest_Request;
 use WP_REST_Response;
@@ -91,6 +92,9 @@ class SettingsController extends BaseController {
 				$log_file_path = ABSPATH . ltrim( $log_file_path, '/' );
 			}
 
+			$migration_service = new DebugLogMigrationService( $wp_config_service );
+			$migration_result  = $migration_service->migrate_existing_logs_to( $log_file_path );
+
 			$enabled = $wp_config_service->enable_debug_logging( $log_file_path, $modify_script_debug );
 
 			if ( ! $enabled ) {
@@ -102,6 +106,29 @@ class SettingsController extends BaseController {
 					500
 				);
 			}
+
+			update_option( 'debugm_log_status', $new_status, false );
+			update_option( 'debugm_log_status_changed', current_time( 'mysql' ), false );
+
+			$message = __( 'Debug logging enabled.', 'logmate' );
+			if ( $migration_result['migrated'] ) {
+				$message = sprintf(
+					/* translators: %s: comma-separated list of source log file names */
+					__( 'Debug logging enabled. Existing log entries were copied from: %s.', 'logmate' ),
+					implode( ', ', array_map( 'basename', $migration_result['sources'] ) )
+				);
+			}
+
+			return $this->response(
+				array(
+					'success' => true,
+					'status'  => $new_status,
+					'message' => $message,
+					'logs_migrated' => $migration_result['migrated'],
+					'logs_migrated_bytes' => $migration_result['bytes'],
+				),
+				200
+			);
 		} else {
 			$wp_config_service->disable_debug_logging();
 		}
@@ -113,9 +140,7 @@ class SettingsController extends BaseController {
 			array(
 				'success' => true,
 				'status'  => $new_status,
-				'message' => 'enabled' === $new_status
-					? __( 'Debug logging enabled.', 'logmate' )
-					: __( 'Debug logging disabled.', 'logmate' ),
+				'message' => __( 'Debug logging disabled.', 'logmate' ),
 			),
 			200
 		);
